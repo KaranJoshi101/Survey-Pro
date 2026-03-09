@@ -1,0 +1,567 @@
+# API Documentation - Survey Application
+
+## Base URL
+```
+http://localhost:5000/api
+```
+
+## Authentication
+Most endpoints require a JWT token. Include it in the Authorization header:
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## 1. Authentication Endpoints
+
+### Register User
+**POST** `/auth/register`
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "User registered successfully",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+---
+
+### Login
+**POST** `/auth/login`
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Login successful",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+---
+
+### Get Current User
+**GET** `/auth/me`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user",
+    "created_at": "2026-03-06T10:00:00Z"
+  }
+}
+```
+
+---
+
+## 2. Survey Endpoints
+
+### Get All Surveys
+**GET** `/surveys?page=1&limit=10&status=published`
+
+**Query Parameters:**
+- `page` (default: 1)
+- `limit` (default: 10)
+- `status` (optional: draft, published, closed)
+
+**Response:**
+```json
+{
+  "surveys": [
+    {
+      "id": 1,
+      "title": "Customer Satisfaction Survey",
+      "description": "Help us improve...",
+      "created_by": 1,
+      "status": "published",
+      "created_at": "2026-03-06T10:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 5,
+    "pages": 1
+  }
+}
+```
+
+---
+
+### Get Survey Details
+**GET** `/surveys/:id`
+
+**Response:**
+```json
+{
+  "survey": {
+    "id": 1,
+    "title": "Customer Satisfaction Survey",
+    "description": "Help us improve...",
+    "created_by": 1,
+    "status": "published",
+    "created_at": "2026-03-06T10:00:00Z",
+    "questions": [
+      {
+        "id": 1,
+        "question_text": "How satisfied are you?",
+        "question_type": "rating",
+        "is_required": true,
+        "order_index": 1,
+        "options": []
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Create Survey (Admin Only)
+**POST** `/surveys`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Request Body:**
+```json
+{
+  "title": "New Survey",
+  "description": "Survey description"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Survey created successfully",
+  "survey": {
+    "id": 5,
+    "title": "New Survey",
+    "description": "Survey description",
+    "created_by": 1,
+    "status": "draft",
+    "created_at": "2026-03-06T10:00:00Z"
+  }
+}
+```
+
+---
+
+### Update Survey (Admin Only)
+**PUT** `/surveys/:id`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Request Body:**
+```json
+{
+  "title": "Updated Title",
+  "description": "Updated description",
+  "status": "published"
+}
+```
+
+---
+
+### Delete Survey (Admin Only)
+**DELETE** `/surveys/:id`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+---
+
+### Add Question to Survey (Admin Only)
+**POST** `/surveys/:surveyId/questions`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Request Body:**
+```json
+{
+  "question_text": "What is your age?",
+  "question_type": "text",
+  "is_required": true,
+  "order_index": 2
+}
+```
+
+---
+
+### Add Option to Question (Admin Only)
+**POST** `/surveys/questions/:questionId/options`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Request Body:**
+```json
+{
+  "option_text": "Option 1",
+  "order_index": 1
+}
+```
+
+---
+
+## 3. Response Endpoints
+
+### Submit Survey Response
+**POST** `/responses`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Request Body:**
+```json
+{
+  "survey_id": 1,
+  "answers": [
+    {
+      "question_id": 1,
+      "answer_text": "5"
+    },
+    {
+      "question_id": 2,
+      "answer_text": "The service is great"
+    },
+    {
+      "question_id": 3,
+      "option_id": 5
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Response submitted successfully",
+  "response_id": 10
+}
+```
+
+---
+
+### Get Survey Responses (Admin Only)
+**GET** `/responses/survey/:surveyId?page=1&limit=10`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Response:**
+```json
+{
+  "responses": [
+    {
+      "id": 10,
+      "survey_id": 1,
+      "user_id": 2,
+      "name": "Jane Doe",
+      "email": "jane@example.com",
+      "submitted_at": "2026-03-06T10:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 5
+  }
+}
+```
+
+---
+
+### Get Response Details
+**GET** `/responses/:responseId`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "response": {
+    "id": 10,
+    "survey_id": 1,
+    "user_id": 2,
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "submitted_at": "2026-03-06T10:00:00Z",
+    "answers": [
+      {
+        "id": 1,
+        "question_id": 1,
+        "question_text": "How satisfied?",
+        "question_type": "rating",
+        "answer_text": "5",
+        "option_id": null,
+        "option_text": null
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Get Survey Analytics (Admin Only)
+**GET** `/responses/survey/:surveyId/analytics`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Response:**
+```json
+{
+  "survey_id": 1,
+  "total_responses": 10,
+  "analytics": [
+    {
+      "id": 1,
+      "question_text": "How satisfied?",
+      "question_type": "rating",
+      "total_responses": 10,
+      "option_counts": []
+    }
+  ]
+}
+```
+
+---
+
+## 4. Article Endpoints
+
+### Get Published Articles
+**GET** `/articles?page=1&limit=10`
+
+**Response:**
+```json
+{
+  "articles": [
+    {
+      "id": 1,
+      "title": "Getting Started",
+      "content": "This article...",
+      "author": 1,
+      "author_name": "Admin User",
+      "created_at": "2026-03-06T10:00:00Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 3
+  }
+}
+```
+
+---
+
+### Get Article Details
+**GET** `/articles/:id`
+
+**Response:**
+```json
+{
+  "article": {
+    "id": 1,
+    "title": "Getting Started",
+    "content": "This article...",
+    "author": 1,
+    "author_name": "Admin User",
+    "is_published": true,
+    "created_at": "2026-03-06T10:00:00Z",
+    "updated_at": "2026-03-06T10:00:00Z"
+  }
+}
+```
+
+---
+
+### Create Article (Admin Only)
+**POST** `/articles`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Request Body:**
+```json
+{
+  "title": "New Article",
+  "content": "Article content here..."
+}
+```
+
+---
+
+### Update Article (Admin Only)
+**PUT** `/articles/:id`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Request Body:**
+```json
+{
+  "title": "Updated Title",
+  "content": "Updated content",
+  "is_published": true
+}
+```
+
+---
+
+### Delete Article (Admin Only)
+**DELETE** `/articles/:id`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+---
+
+### Get Admin Articles (Admin Only)
+**GET** `/articles/admin/my-articles?page=1&limit=10`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+---
+
+## Error Responses
+
+### 400 Bad Request
+```json
+{
+  "error": "Missing required fields",
+  "required": ["name", "email", "password"]
+}
+```
+
+### 401 Unauthorized
+```json
+{
+  "error": "Authentication failed",
+  "message": "Invalid or expired token"
+}
+```
+
+### 403 Forbidden
+```json
+{
+  "error": "Forbidden",
+  "message": "Only admins can perform this action"
+}
+```
+
+### 404 Not Found
+```json
+{
+  "error": "Survey not found"
+}
+```
+
+### 409 Conflict
+```json
+{
+  "error": "Email already registered"
+}
+```
+
+### 500 Internal Server Error
+```json
+{
+  "error": "Internal Server Error"
+}
+```
+
+---
+
+## Test Users (From Seed Data)
+
+### Admin
+- Email: `admin@surveyapp.com`
+- Password: `admin123`
+
+### Regular Users
+- Email: `john@example.com` | Password: `admin123`
+- Email: `jane@example.com` | Password: `admin123`
+- Email: `bob@example.com` | Password: `admin123`
+
+---
+
+## Development Notes
+
+- All timestamps are in ISO 8601 format
+- Pagination defaults: page=1, limit=10
+- JWT tokens expire after 7 days
+- Passwords are hashed using bcryptjs
+- Database uses PostgreSQL with SERIAL IDs

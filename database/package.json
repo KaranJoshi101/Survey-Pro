@@ -1,0 +1,13 @@
+{
+  "name": "survey-app-database",
+  "version": "1.0.0",
+  "description": "Database initialization and seeding",
+  "main": "init.js",
+  "scripts": {
+    "init": "node init.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.3",
+    "dotenv": "^16.3.1"
+  }
+}
