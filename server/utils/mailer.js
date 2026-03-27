@@ -25,7 +25,21 @@ const getTransporter = () => {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
         },
+        connectionTimeout: 10000,
+        socketTimeout: 10000,
     });
+};
+
+const sendMailWithTimeout = async (transporter, mailOptions, timeoutMs = 15000) => {
+    return Promise.race([
+        transporter.sendMail(mailOptions),
+        new Promise((_, reject) =>
+            setTimeout(
+                () => reject(new Error(`Email send timeout after ${timeoutMs}ms`)),
+                timeoutMs
+            )
+        ),
+    ]);
 };
 
 const normalizeAttachments = (rawAttachments) => {
@@ -142,20 +156,30 @@ const sendSurveySubmissionEmail = async ({
         ? buildCustomEmail({ userName, surveyTitle, templateSubject, templateBody, submittedAt })
         : buildGenericEmail({ userName, surveyTitle, submittedAt });
 
-    await transporter.sendMail({
+    const mailOptions = {
         from: `${fromName} <${fromEmail}>`,
         to,
         subject: payload.subject,
         text: payload.text,
         html: payload.html,
         attachments,
-    });
-
-    return {
-        sent: true,
-        skipped: false,
-        attachmentCount: attachments.length,
     };
+
+    try {
+        await sendMailWithTimeout(transporter, mailOptions, 20000);
+        return {
+            sent: true,
+            skipped: false,
+            attachmentCount: attachments.length,
+        };
+    } catch (err) {
+        console.error('❌ Survey submission email send failed:', err.message);
+        return {
+            sent: false,
+            skipped: false,
+            reason: err.message,
+        };
+    }
 };
 
 const sendSignupOtpEmail = async ({ to, userName, otpCode, expiresMinutes = 10 }) => {
@@ -193,18 +217,29 @@ const sendSignupOtpEmail = async ({ to, userName, otpCode, expiresMinutes = 10 }
         <p>Survey Pro Team</p>
     `;
 
-    await transporter.sendMail({
+    const mailOptions = {
         from: `${fromName} <${fromEmail}>`,
         to,
         subject,
         text,
         html,
-    });
-
-    return {
-        sent: true,
-        skipped: false,
     };
+
+    try {
+        await sendMailWithTimeout(transporter, mailOptions, 15000);
+        console.log(`✅ OTP email sent to ${to}`);
+        return {
+            sent: true,
+            skipped: false,
+        };
+    } catch (err) {
+        console.error(`❌ OTP email send failed for ${to}:`, err.message);
+        return {
+            sent: false,
+            skipped: false,
+            reason: err.message,
+        };
+    }
 };
 
 module.exports = {

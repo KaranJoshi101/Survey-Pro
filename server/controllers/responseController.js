@@ -105,32 +105,24 @@ const submitResponse = async (req, res, next) => {
 
         await client.query('COMMIT');
 
-        let emailInfo = { sent: false, skipped: true, reason: 'Not attempted' };
+        // Send email asynchronously (fire-and-forget) so response is immediate
         if (userProfile.email) {
-            try {
-                emailInfo = await sendSurveySubmissionEmail({
-                    to: userProfile.email,
-                    userName: userProfile.name,
-                    surveyTitle: survey.title,
-                    submittedAt: new Date(),
-                    templateSubject: survey.submission_email_subject,
-                    templateBody: survey.submission_email_body,
-                    templateAttachments: survey.submission_email_attachments,
-                });
-            } catch (mailErr) {
-                emailInfo = {
-                    sent: false,
-                    skipped: false,
-                    reason: mailErr.message,
-                };
+            sendSurveySubmissionEmail({
+                to: userProfile.email,
+                userName: userProfile.name,
+                surveyTitle: survey.title,
+                submittedAt: new Date(),
+                templateSubject: survey.submission_email_subject,
+                templateBody: survey.submission_email_body,
+                templateAttachments: survey.submission_email_attachments,
+            }).catch((mailErr) => {
                 console.warn(`⚠️ Survey submission email failed for user ${user_id}: ${mailErr.message}`);
-            }
+            });
         }
 
         res.status(201).json({
             message: 'Response submitted successfully',
             response_id,
-            email: emailInfo,
         });
     } catch (err) {
         await client.query('ROLLBACK');

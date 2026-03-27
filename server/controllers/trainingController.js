@@ -705,14 +705,20 @@ const deletePlaylist = async (req, res, next) => {
                 return res.status(404).json({ error: 'Playlist not found' });
             }
 
+            // Get video IDs from this playlist
             const videoIdsResult = await client.query(
                 'SELECT DISTINCT video_id FROM playlist_items WHERE playlist_id = $1',
                 [id]
             );
             const videoIds = videoIdsResult.rows.map((row) => row.video_id);
 
+            // Delete playlist_items for this playlist first
+            await client.query('DELETE FROM playlist_items WHERE playlist_id = $1', [id]);
+
+            // Delete the playlist
             await client.query('DELETE FROM training_playlists WHERE id = $1', [id]);
 
+            // Delete orphan videos (videos not in ANY remaining playlist_items)
             let deletedOrphanVideos = 0;
             if (videoIds.length > 0) {
                 const orphanDeleteResult = await client.query(
