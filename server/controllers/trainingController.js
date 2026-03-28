@@ -1111,15 +1111,15 @@ const getCategoryNotes = async (req, res, next) => {
             return res.status(404).json({ error: 'Training category not found' });
         }
 
-        const query = onlyActive
-            ? `SELECT id, category_id, title, content, document_url, display_order, is_active, created_at, updated_at
-               FROM training_notes
-               WHERE category_id = $1 AND is_active = true
-               ORDER BY display_order ASC, id ASC`
-            : `SELECT id, category_id, title, content, document_url, display_order, is_active, created_at, updated_at
-               FROM training_notes
-               WHERE category_id = $1
-               ORDER BY display_order ASC, id ASC`;
+          const query = onlyActive
+                ? `SELECT id, category_id, title, document_url, display_order, is_active, created_at, updated_at
+                    FROM training_notes
+                    WHERE category_id = $1 AND is_active = true
+                    ORDER BY display_order ASC, id ASC`
+                : `SELECT id, category_id, title, document_url, display_order, is_active, created_at, updated_at
+                    FROM training_notes
+                    WHERE category_id = $1
+                    ORDER BY display_order ASC, id ASC`;
 
         const result = await pool.query(query, [categoryId]);
 
@@ -1147,17 +1147,16 @@ const createCategoryNote = async (req, res, next) => {
         console.log('CREATE NOTE - Title type:', typeof title);
 
         const safeTitle = typeof title === 'string' ? title.trim() : '';
-        const safeContent = typeof content === 'string' ? content.trim() : null;
         const safeDocumentUrl = typeof document_url === 'string' ? document_url.trim() : null;
 
-        console.log('CREATE NOTE - Safe values:', { safeTitle, safeContent, safeDocumentUrl });
+        console.log('CREATE NOTE - Safe values:', { safeTitle, safeDocumentUrl });
 
         if (!safeTitle) {
             return res.status(400).json({ error: 'Note title is required' });
         }
 
-        if (!safeContent && !safeDocumentUrl) {
-            return res.status(400).json({ error: 'Provide either note content or document URL' });
+        if (!safeDocumentUrl) {
+            return res.status(400).json({ error: 'Provide a document URL' });
         }
 
         const category = await pool.query('SELECT id FROM training_categories WHERE id = $1', [categoryId]);
@@ -1166,13 +1165,12 @@ const createCategoryNote = async (req, res, next) => {
         }
 
         const result = await pool.query(
-            `INSERT INTO training_notes (category_id, title, content, document_url, display_order, is_active)
-             VALUES ($1, $2, $3, $4, $5, $6)
-             RETURNING id, category_id, title, content, document_url, display_order, is_active, created_at, updated_at`,
+            `INSERT INTO training_notes (category_id, title, document_url, display_order, is_active)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING id, category_id, title, document_url, display_order, is_active, created_at, updated_at`,
             [
                 categoryId,
                 safeTitle.slice(0, 255),
-                safeContent ? safeContent.slice(0, 10000) : null,
                 safeDocumentUrl ? safeDocumentUrl.slice(0, 1000) : null,
                 clamp(display_order, 0, 100000, 0),
                 Boolean(is_active),
@@ -1193,7 +1191,7 @@ const createCategoryNote = async (req, res, next) => {
 const updateCategoryNote = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { title, content, document_url, display_order, is_active } = req.body;
+        const { title, document_url, display_order, is_active } = req.body;
 
         const existing = await pool.query('SELECT id FROM training_notes WHERE id = $1', [id]);
         if (existing.rows.length === 0) {
@@ -1234,17 +1232,13 @@ const updateCategoryNote = async (req, res, next) => {
         }
 
         const previewValues = { ...req.body };
-        if (fields.some((field) => field.startsWith('content')) || fields.some((field) => field.startsWith('document_url'))) {
-            const safeContent = Object.prototype.hasOwnProperty.call(previewValues, 'content')
-                ? (typeof previewValues.content === 'string' ? previewValues.content.trim() : previewValues.content)
-                : undefined;
+        if (fields.some((field) => field.startsWith('document_url'))) {
             const safeDocumentUrl = Object.prototype.hasOwnProperty.call(previewValues, 'document_url')
                 ? (typeof previewValues.document_url === 'string' ? previewValues.document_url.trim() : previewValues.document_url)
                 : undefined;
 
-            if ((safeContent === '' || safeContent === null || safeContent === undefined)
-                && (safeDocumentUrl === '' || safeDocumentUrl === null || safeDocumentUrl === undefined)) {
-                return res.status(400).json({ error: 'Provide either note content or document URL' });
+            if (safeDocumentUrl === '' || safeDocumentUrl === null || safeDocumentUrl === undefined) {
+                return res.status(400).json({ error: 'Provide a document URL' });
             }
         }
 
@@ -1255,7 +1249,7 @@ const updateCategoryNote = async (req, res, next) => {
             `UPDATE training_notes
              SET ${fields.join(', ')}
              WHERE id = $${idx}
-             RETURNING id, category_id, title, content, document_url, display_order, is_active, created_at, updated_at`,
+             RETURNING id, category_id, title, document_url, display_order, is_active, created_at, updated_at`,
             values
         );
 

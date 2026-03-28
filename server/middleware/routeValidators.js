@@ -131,12 +131,7 @@ const articleWriteValidation = [
         .trim()
         .isLength({ min: 3, max: 300 })
         .withMessage('title must be between 3 and 300 characters'),
-    body('content')
-        .optional()
-        .isString()
-        .trim()
-        .isLength({ min: 1, max: 2000000 })
-        .withMessage('content must be between 1 and 2000000 characters'),
+    // content validation removed for training_notes
     body('is_published')
         .optional()
         .isBoolean()
