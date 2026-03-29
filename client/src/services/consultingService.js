@@ -85,8 +85,10 @@ const consultingService = {
         return api.put(`/consulting/requests/${id}`, payload);
     },
 
-    getAnalyticsOverview() {
-        return api.get('/consulting/analytics/overview');
+    getAnalyticsOverview(period = '30d') {
+        return api.get('/consulting/analytics/overview', {
+            params: { period },
+        });
     },
 
     getServiceAnalytics(serviceId, days = 30) {
