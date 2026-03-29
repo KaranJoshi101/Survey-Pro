@@ -136,7 +136,7 @@ const ProfilePage = () => {
                 <div className="card" style={{ marginBottom: '24px' }}>
                     <div className="card-body">
                         <h2 style={{ marginTop: 0, color: '#003594' }}>Account Info</h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+                        <div className="responsive-three-col-grid" style={{ gap: '16px' }}>
                             <div>
                                 <p style={{ margin: 0, color: '#666', fontSize: '0.85rem' }}>Email</p>
                                 <p style={{ margin: '4px 0 0 0', fontWeight: 'bold' }}>{profile.email}</p>
@@ -173,7 +173,7 @@ const ProfilePage = () => {
                                 />
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="responsive-two-col-grid" style={{ gap: '16px' }}>
                                 <div className="form-group">
                                     <label>Age</label>
                                     <input
@@ -205,7 +205,7 @@ const ProfilePage = () => {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="responsive-two-col-grid" style={{ gap: '16px' }}>
                                 <div className="form-group">
                                     <label>Phone</label>
                                     <input

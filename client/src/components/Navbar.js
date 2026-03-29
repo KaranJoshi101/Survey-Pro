@@ -59,11 +59,13 @@ const Navbar = () => {
                 style={{
                     backgroundColor: '#003594',
                     color: 'white',
-                    padding: '0 20px',
-                    height: '60px',
+                    padding: '8px 12px',
+                    minHeight: '60px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '10px',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                 }}
             >
@@ -83,12 +85,12 @@ const Navbar = () => {
                     <FaClipboardList size={20} aria-hidden="true" />
                     <span>Survey Pro</span>
                 </Link>
-                <div className="flex align-center gap-3">
+                <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
                     <Link to="/surveys" style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}>Surveys</Link>
                     <Link to="/articles" style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}>Articles</Link>
                     <Link to="/consulting" style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}>Consulting</Link>
                 </div>
-                <div className="flex align-center gap-3">
+                <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
                     <Link
                         to="/login"
                         style={{
@@ -126,15 +128,17 @@ const Navbar = () => {
             style={{
                 backgroundColor: '#003594',
                 color: 'white',
-                padding: '0 20px',
-                height: '60px',
+                padding: '8px 12px',
+                minHeight: '60px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '10px',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             }}
         >
-            <div className="flex align-center gap-3">
+            <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
                 <Link
                     to="/dashboard"
                     style={{
@@ -153,7 +157,7 @@ const Navbar = () => {
                 </Link>
             </div>
 
-            <div className="flex align-center gap-3">
+            <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
                 <Link
                     to="/surveys"
                     style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}

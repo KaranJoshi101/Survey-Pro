@@ -213,7 +213,7 @@ const AdminDashboardPage = () => {
                             </div>
                             {surveyCategoryChartData && surveyCategoryChartData.labels.length > 0 ? (
                                 <>
-                                    <div style={{ height: '340px' }}>
+                                    <div className="admin-chart-canvas">
                                         <Doughnut data={surveyCategoryChartData} options={surveyCategoryChartOptions} />
                                     </div>
                                     {/* legend note removed */}
@@ -234,7 +234,7 @@ const AdminDashboardPage = () => {
                                 <span className="admin-chip draft">Banned: {dashboardStats.summary.banned_users}</span>
                             </div>
                             {userStatusChartData ? (
-                                <div style={{ height: '340px' }}>
+                                <div className="admin-chart-canvas">
                                     <Doughnut data={userStatusChartData} options={userStatusChartOptions} />
                                 </div>
                             ) : (
@@ -255,7 +255,7 @@ const AdminDashboardPage = () => {
                             </div>
                             {articleCategoryChartData && articleCategoryChartData.labels.length > 0 ? (
                                 <>
-                                    <div style={{ height: '340px' }}>
+                                    <div className="admin-chart-canvas">
                                         <Doughnut data={articleCategoryChartData} options={articleCategoryChartOptions} />
                                     </div>
                                     {/* legend note removed */}
@@ -276,7 +276,7 @@ const AdminDashboardPage = () => {
                                 <span className="admin-chip draft">Draft: {trainingCategoryCounts.draft}</span>
                             </div>
                             {trainingCategoryChartData && trainingCategoryChartData.labels.length > 0 ? (
-                                <div style={{ height: '340px' }}>
+                                <div className="admin-chart-canvas">
                                     <Doughnut data={trainingCategoryChartData} options={trainingCategoryChartOptions} />
                                 </div>
                             ) : (

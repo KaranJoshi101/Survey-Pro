@@ -171,8 +171,8 @@ const AdminConsultingAnalyticsPage = () => {
             <p style={{ color: '#555', marginBottom: '20px' }}>
                 Monitor engagement and conversion performance across consulting services.
             </p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="admin-analytics-toolbar" style={{ marginBottom: '20px' }}>
+                <div className="admin-analytics-toolbar-left">
                     <p style={{ margin: 0, color: '#666' }}>
                         {lastUpdated ? `Last updated: ${lastUpdated.toLocaleString()}` : 'Last updated: -'}
                     </p>
@@ -182,7 +182,6 @@ const AdminConsultingAnalyticsPage = () => {
                     <select
                         id="analytics-period"
                         className="form-input"
-                        style={{ minWidth: '190px' }}
                         value={selectedPeriod}
                         onChange={(event) => setSelectedPeriod(event.target.value)}
                     >
@@ -230,7 +229,7 @@ const AdminConsultingAnalyticsPage = () => {
                         <div className="card" style={{ maxWidth: '100%' }}>
                             <div className="card-body">
                                 <h2>{`Views Over Time (${selectedPeriodLabel})`}</h2>
-                                <div style={{ height: '320px' }}>
+                                <div className="admin-chart-canvas compact">
                                     <Line data={viewsTrendData} options={lineOptions} />
                                 </div>
                             </div>
@@ -238,7 +237,7 @@ const AdminConsultingAnalyticsPage = () => {
                         <div className="card" style={{ maxWidth: '100%' }}>
                             <div className="card-body">
                                 <h2>{`Requests Over Time (${selectedPeriodLabel})`}</h2>
-                                <div style={{ height: '320px' }}>
+                                <div className="admin-chart-canvas compact">
                                     <Line data={requestsTrendData} options={lineOptions} />
                                 </div>
                             </div>

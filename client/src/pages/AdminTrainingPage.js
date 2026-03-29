@@ -591,7 +591,7 @@ const AdminTrainingPage = () => {
                     </p>
                     {selectedCategoryId ? (
                         <>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                            <div className="responsive-two-col-grid" style={{ gap: '12px', marginBottom: '12px' }}>
                                 <button
                                     type="button"
                                     className={`btn ${selectedSection === 'notes' ? 'btn-primary' : 'btn-outline-primary'}`}
@@ -730,7 +730,7 @@ const AdminTrainingPage = () => {
                                                     fontWeight: '600',
                                                     textDecoration: 'none',
                                                     color: '#003594',
-                                                    whiteSpace: 'nowrap',
+                                                    whiteSpace: 'normal',
                                                     flexShrink: 0,
                                                 }}
                                             >

@@ -339,12 +339,12 @@ const AdminArticlesPage = () => {
                                 />
                             </div>
 
-                            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
                                 <button
                                     type="submit"
                                     className="btn btn-success"
                                     disabled={submitting}
-                                    style={{ flex: 1 }}
+                                    style={{ flex: '1 1 220px' }}
                                 >
                                     {submitting ? (editingId ? 'Updating...' : 'Creating...') : (editingId ? 'Update Article' : 'Create Article')}
                                 </button>
@@ -352,7 +352,7 @@ const AdminArticlesPage = () => {
                                     type="button"
                                     onClick={handleCancel}
                                     className="btn btn-secondary"
-                                    style={{ flex: 1 }}
+                                    style={{ flex: '1 1 220px' }}
                                 >
                                     Cancel
                                 </button>
@@ -388,8 +388,8 @@ const AdminArticlesPage = () => {
                                 style={{ marginBottom: '16px' }}
                             >
                                 <div className="card-body">
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                                        <div style={{ flex: 1 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                                        <div style={{ flex: '1 1 220px', minWidth: 0 }}>
                                             <h3 style={{ margin: 0, marginBottom: '8px' }}>{article.title}</h3>
                                             <p style={{ color: '#888', fontSize: '0.9rem', margin: 0 }}>
                                                 Created:{' '}

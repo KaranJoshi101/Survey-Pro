@@ -114,12 +114,26 @@ This script performs:
 1. Check `.env` DB values and PostgreSQL availability.
 2. Check if backend port is already in use.
 3. Run `npm run db:init` if schema is missing.
+4. If you see `Port 5000 is already in use`, free the port and retry:
+
+```powershell
+Get-NetTCPConnection -LocalPort 5000 -State Listen | Select-Object OwningProcess
+Stop-Process -Id <PID> -Force
+npm run start:server
+```
 
 ### Frontend fails to connect
 
 1. Confirm backend is running.
 2. Confirm `REACT_APP_API_URL` matches backend API URL.
 3. Restart frontend after changing env values.
+4. If frontend prompts that port `3000` is already in use, either stop the old process or keep using the running instance:
+
+```powershell
+Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object OwningProcess
+Stop-Process -Id <PID> -Force
+npm start
+```
 
 ### Analytics values look stale
 

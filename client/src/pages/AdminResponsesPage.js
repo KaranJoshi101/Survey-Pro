@@ -146,7 +146,7 @@ const AdminResponsesPage = () => {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px', minHeight: '600px' }}>
+            <div className="admin-responses-layout">
                 {/* Surveys List */}
                 <div>
                     <div className="card">
@@ -155,7 +155,7 @@ const AdminResponsesPage = () => {
                             {surveys.length === 0 ? (
                                 <p style={{ color: '#666' }}>No surveys available</p>
                             ) : (
-                                <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                                <div className="admin-responses-survey-list">
                                     {surveys.map((survey) => (
                                         <div
                                             key={survey.id}
@@ -208,7 +208,7 @@ const AdminResponsesPage = () => {
                                 <div className="card" style={{ marginBottom: '24px' }}>
                                     <div className="card-body">
                                         <h3>Analytics for "{selectedSurvey.title}"</h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginTop: '16px' }}>
+                                        <div className="responsive-three-col-grid" style={{ gap: '16px', marginTop: '16px' }}>
                                             <div style={{
                                                 padding: '16px',
                                                 backgroundColor: '#e8f0fe',
@@ -306,8 +306,8 @@ const AdminResponsesPage = () => {
                                                         borderLeft: '4px solid #003594',
                                                     }}
                                                 >
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                        <div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                                                        <div style={{ flex: '1 1 220px', minWidth: 0 }}>
                                                             <p style={{ margin: 0, fontWeight: 'bold', marginBottom: '4px' }}>
                                                                 {index + 1}. {response.user_name || 'Anonymous User'}
                                                             </p>

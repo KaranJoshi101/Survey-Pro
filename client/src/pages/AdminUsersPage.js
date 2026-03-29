@@ -131,81 +131,83 @@ const AdminUsersPage = () => {
                     <p className="admin-empty-text">No users found</p>
                 </div>
             ) : (
-                <table className="card admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map((user) => (
-                            <tr key={user.id}>
-                                <td className="admin-cell">{user.id}</td>
-                                <td className="admin-cell">
-                                    <strong>{user.name}</strong>
-                                </td>
-                                <td className="admin-cell">{user.email}</td>
-                                <td className="admin-cell">
-                                    <span className={`badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}`}>
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td className="admin-cell">
-                                    <span className={`badge ${user.is_banned ? 'badge-banned' : 'badge-active'}`}>
-                                        {user.is_banned ? 'Banned' : 'Active'}
-                                    </span>
-                                </td>
-                                <td className="admin-cell-muted">
-                                    {new Date(user.created_at).toLocaleDateString()}
-                                </td>
-                                <td className="admin-cell">
-                                    <div className="admin-actions-wrap">
-                                    <button
-                                        onClick={() => setSelectedUser(user)}
-                                        className="btn btn-primary btn-compact"
-                                    >
-                                        View
-                                    </button>
-                                    {user.role !== 'admin' && (
-                                        user.is_banned ? (
-                                            <button
-                                                onClick={() => handleUnban(user.id)}
-                                                className="btn btn-success btn-compact"
-                                                disabled={banning === user.id}
-                                            >
-                                                {banning === user.id ? 'Unbanning...' : 'Unban'}
-                                            </button>
-                                        ) : (
-                                            <button
-                                                onClick={() => handleBan(user.id)}
-                                                className="btn btn-danger btn-compact"
-                                                disabled={banning === user.id}
-                                            >
-                                                {banning === user.id ? 'Banning...' : 'Ban'}
-                                            </button>
-                                        )
-                                    )}
-                                    {user.role !== 'admin' && user.is_banned && (
-                                        <button
-                                            onClick={() => handleDelete(user.id)}
-                                            className="btn btn-danger btn-compact btn-critical"
-                                            disabled={deleting === user.id || banning === user.id}
-                                        >
-                                            {deleting === user.id ? 'Deleting...' : 'Delete'}
-                                        </button>
-                                    )}
-                                    </div>
-                                </td>
+                <div className="card admin-table-card">
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {users.map((user) => (
+                                <tr key={user.id}>
+                                    <td className="admin-cell">{user.id}</td>
+                                    <td className="admin-cell">
+                                        <strong>{user.name}</strong>
+                                    </td>
+                                    <td className="admin-cell">{user.email}</td>
+                                    <td className="admin-cell">
+                                        <span className={`badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}`}>
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td className="admin-cell">
+                                        <span className={`badge ${user.is_banned ? 'badge-banned' : 'badge-active'}`}>
+                                            {user.is_banned ? 'Banned' : 'Active'}
+                                        </span>
+                                    </td>
+                                    <td className="admin-cell-muted">
+                                        {new Date(user.created_at).toLocaleDateString()}
+                                    </td>
+                                    <td className="admin-cell">
+                                        <div className="admin-actions-wrap">
+                                            <button
+                                                onClick={() => setSelectedUser(user)}
+                                                className="btn btn-primary btn-compact"
+                                            >
+                                                View
+                                            </button>
+                                            {user.role !== 'admin' && (
+                                                user.is_banned ? (
+                                                    <button
+                                                        onClick={() => handleUnban(user.id)}
+                                                        className="btn btn-success btn-compact"
+                                                        disabled={banning === user.id}
+                                                    >
+                                                        {banning === user.id ? 'Unbanning...' : 'Unban'}
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleBan(user.id)}
+                                                        className="btn btn-danger btn-compact"
+                                                        disabled={banning === user.id}
+                                                    >
+                                                        {banning === user.id ? 'Banning...' : 'Ban'}
+                                                    </button>
+                                                )
+                                            )}
+                                            {user.role !== 'admin' && user.is_banned && (
+                                                <button
+                                                    onClick={() => handleDelete(user.id)}
+                                                    className="btn btn-danger btn-compact btn-critical"
+                                                    disabled={deleting === user.id || banning === user.id}
+                                                >
+                                                    {deleting === user.id ? 'Deleting...' : 'Delete'}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
 
             {/* Pagination */}
@@ -295,7 +297,7 @@ const AdminUsersPage = () => {
                             </span>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="responsive-two-col-grid" style={{ gap: '16px' }}>
                             <div>
                                 <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Name</p>
                                 <p style={{ margin: '4px 0 0 0', fontWeight: 'bold' }}>{selectedUser.name}</p>

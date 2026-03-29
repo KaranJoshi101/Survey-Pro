@@ -111,34 +111,34 @@ const SurveyAnalyticsPage = () => {
         return (
             <div className="card" style={{ marginBottom: '24px' }} key={question.id}>
                 <div className="card-body">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
                         <h3 style={{ margin: 0 }}>{question.question_text}</h3>
                         <span style={{
                             backgroundColor: question.question_type === 'multiple_choice' ? '#e8f0fe' : '#e8f8f0',
                             color: question.question_type === 'multiple_choice' ? '#003594' : '#1a6e42',
-                            padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap',
+                            padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold',
                         }}>
                             {question.question_type === 'multiple_choice' ? 'Multiple Choice' : 'Checkbox'} | {question.total_answered} responses
                         </span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '24px', alignItems: 'center' }}>
+                    <div className="survey-analytics-chart-split">
                         <div><Bar data={barData} options={barOptions} /></div>
                         <div><Doughnut data={doughnutData} options={doughnutOptions} /></div>
                     </div>
                     <div style={{ marginTop: '20px' }}>
                         {question.option_counts.map((opt, idx) => (
                             <div key={opt.option_id} style={{
-                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px',
                                 padding: '10px 12px', borderBottom: idx < question.option_counts.length - 1 ? '1px solid #eee' : 'none',
                             }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 220px', minWidth: 0 }}>
                                     <div style={{
                                         width: '12px', height: '12px', borderRadius: '2px',
                                         backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
                                     }} />
-                                    <span>{opt.option_text}</span>
+                                    <span style={{ wordBreak: 'break-word' }}>{opt.option_text}</span>
                                 </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '1 1 220px', minWidth: 0, justifyContent: 'flex-end' }}>
                                     <div style={{
                                         width: '100px', height: '8px', backgroundColor: '#E8E9EE', borderRadius: '4px', overflow: 'hidden',
                                     }}>
@@ -147,7 +147,7 @@ const SurveyAnalyticsPage = () => {
                                             backgroundColor: CHART_COLORS[idx % CHART_COLORS.length], borderRadius: '4px',
                                         }} />
                                     </div>
-                                    <span style={{ color: '#666', fontSize: '0.9rem', minWidth: '80px', textAlign: 'right' }}>
+                                    <span style={{ color: '#666', fontSize: '0.9rem', textAlign: 'right' }}>
                                         {opt.count} ({opt.percentage}%)
                                     </span>
                                 </div>
@@ -196,20 +196,20 @@ const SurveyAnalyticsPage = () => {
         return (
             <div className="card" style={{ marginBottom: '24px' }} key={question.id}>
                 <div className="card-body">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
                         <h3 style={{ margin: 0 }}>{question.question_text}</h3>
                         <span style={{
                             backgroundColor: '#fff8e1', color: '#8a6d00',
-                            padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap',
+                            padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold',
                         }}>
                             Rating | {question.total_answered} responses
                         </span>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '24px', alignItems: 'center' }}>
+                    <div className="survey-analytics-rating-split">
                         <div><Bar data={barData} options={barOptions} /></div>
-                        <div style={{
+                        <div className="survey-analytics-rating-summary" style={{
                             padding: '24px 32px', textAlign: 'center',
-                            backgroundColor: '#e8f0fe', borderRadius: '8px', minWidth: '140px',
+                            backgroundColor: '#e8f0fe', borderRadius: '8px',
                         }}>
                             <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Average Rating</p>
                             <h2 style={{ margin: '8px 0 0 0', color: '#003594', fontSize: '2.5rem' }}>
@@ -225,10 +225,10 @@ const SurveyAnalyticsPage = () => {
                             const colors = ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#003594'];
                             return (
                                 <div key={d.rating} style={{
-                                    display: 'flex', alignItems: 'center', gap: '12px',
+                                    display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap',
                                     padding: '6px 0',
                                 }}>
-                                    <span style={{ minWidth: '55px', fontSize: '0.9rem', color: '#555' }}>{d.rating} Star{d.rating > 1 ? 's' : ''}</span>
+                                    <span style={{ flex: '1 1 120px', fontSize: '0.9rem', color: '#555' }}>{d.rating} Star{d.rating > 1 ? 's' : ''}</span>
                                     <div style={{
                                         flex: 1, height: '10px', backgroundColor: '#E8E9EE', borderRadius: '5px', overflow: 'hidden',
                                     }}>
@@ -237,7 +237,7 @@ const SurveyAnalyticsPage = () => {
                                             backgroundColor: colors[idx], borderRadius: '5px',
                                         }} />
                                     </div>
-                                    <span style={{ minWidth: '70px', textAlign: 'right', fontSize: '0.85rem', color: '#666' }}>
+                                    <span style={{ textAlign: 'right', fontSize: '0.85rem', color: '#666' }}>
                                         {d.count} ({percentage}%)
                                     </span>
                                 </div>
@@ -253,11 +253,11 @@ const SurveyAnalyticsPage = () => {
         return (
             <div className="card" style={{ marginBottom: '24px' }} key={question.id}>
                 <div className="card-body">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
                         <h3 style={{ margin: 0 }}>{question.question_text}</h3>
                         <span style={{
                             backgroundColor: '#f3e5f5', color: '#8e44ad',
-                            padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap',
+                            padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold',
                         }}>
                             Text | {question.total_answered} responses
                         </span>
@@ -326,7 +326,7 @@ const SurveyAnalyticsPage = () => {
             </div>
 
             {/* Overview Stats */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '32px' }}>
+            <div className="responsive-three-col-grid" style={{ gap: '16px', marginBottom: '32px' }}>
                 <div style={{
                     padding: '16px', backgroundColor: '#e8f0fe',
                     borderRadius: '4px', borderLeft: '4px solid #003594',
@@ -354,7 +354,7 @@ const SurveyAnalyticsPage = () => {
             {demographics && (demographics.gender_distribution.length > 0 || demographics.age_distribution.length > 0 || demographics.location_distribution.length > 0) && (
                 <div style={{ marginBottom: '32px' }}>
                     <h2 style={{ color: '#003594', marginBottom: '16px' }}>Respondent Demographics</h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+                    <div className="responsive-three-col-grid" style={{ gap: '24px' }}>
                         {/* Gender Distribution */}
                         <div className="card">
                             <div className="card-body">
@@ -600,7 +600,7 @@ const SurveyAnalyticsPage = () => {
                             </span>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                        <div className="responsive-two-col-grid" style={{ gap: '16px' }}>
                             <div>
                                 <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Name</p>
                                 <p style={{ margin: '4px 0 0 0', fontWeight: 'bold' }}>{selectedUser.name}</p>

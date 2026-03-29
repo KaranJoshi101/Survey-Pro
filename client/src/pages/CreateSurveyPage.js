@@ -488,7 +488,7 @@ const CreateSurveyPage = () => {
                                                 key={`${attachment.name}-${index}`}
                                                 style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'center', marginBottom: '6px', backgroundColor: '#fff', padding: '8px 10px', borderRadius: '6px', border: '1px solid #e4e9f5' }}
                                             >
-                                                <span style={{ fontSize: '0.9rem', color: '#2b2b2b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                <span style={{ fontSize: '0.9rem', color: '#2b2b2b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
                                                     {attachment.name}
                                                 </span>
                                                 <button

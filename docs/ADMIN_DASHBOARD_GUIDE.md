@@ -40,6 +40,11 @@ This guide documents the current admin capabilities and the concrete implementat
   - Training category status distribution.
 - Quick navigation cards for all active admin modules.
 
+#### Quick admin steps
+1. Login as admin and open `/admin`.
+2. Review dashboard charts for a quick health snapshot.
+3. Click the relevant module card to continue management tasks.
+
 ### 2.2 Survey Management (`/admin/surveys`)
 - Survey listing with search by title.
 - Survey status chips and summary counters.
@@ -47,6 +52,12 @@ This guide documents the current admin capabilities and the concrete implementat
 - One-click survey response export to Excel.
 - Jump to survey analytics page.
 - Question count display per survey.
+
+#### Quick admin steps
+1. Open `/admin/surveys` and search by survey title if needed.
+2. Use `Create`, `Edit`, `Publish/Unpublish`, or `Delete` actions as needed.
+3. Use `Export` to download responses for a survey.
+4. Open survey analytics from the action controls for deeper insights.
 
 ### 2.3 Survey Builder (`/admin/surveys/create`, `/admin/surveys/:id/edit`)
 - Survey metadata:
@@ -63,6 +74,12 @@ This guide documents the current admin capabilities and the concrete implementat
   - Question text required.
   - Option-based questions require at least two non-empty options.
 
+#### Quick admin steps
+1. Open create or edit route for the target survey.
+2. Fill metadata fields, then add questions and options.
+3. Validate required fields and option counts.
+4. Save and return to survey management to publish when ready.
+
 ### 2.4 Response Hub (`/admin/responses`)
 - Survey selector and response table for selected survey.
 - URL-synced selected survey ID.
@@ -70,6 +87,12 @@ This guide documents the current admin capabilities and the concrete implementat
 - Survey-level analytics summary.
 - Export selected survey responses to Excel.
 - Link to full survey analytics view.
+
+#### Quick admin steps
+1. Open `/admin/responses` and choose a survey.
+2. Search responses by user name, email, or user ID.
+3. Review summary metrics and export `.xlsx` if needed.
+4. Open full analytics for detailed visual analysis.
 
 ### 2.5 Survey Analytics (`/admin/surveys/:id/analytics`)
 - Question-level analytics with chart rendering:
@@ -80,12 +103,24 @@ This guide documents the current admin capabilities and the concrete implementat
 - Respondent profile quick-view.
 - Demographic charts (gender, age, location).
 
+#### Quick admin steps
+1. Open survey analytics from survey management or responses hub.
+2. Review question-level charts and text answer sections.
+3. Use respondent search to find a user quickly.
+4. Check demographics to understand audience distribution.
+
 ### 2.6 User Management (`/admin/users`)
 - Paginated users table.
 - Debounced search by name/email.
 - Ban and unban flows.
 - Permanent delete flow for banned, non-admin users only.
 - Extended user profile preview (age, gender, phone, location, bio, timestamps).
+
+#### Quick admin steps
+1. Open `/admin/users` and search for a user.
+2. Use `Ban` or `Unban` based on moderation need.
+3. Open user detail preview to inspect profile context.
+4. Delete only banned non-admin users when permanent removal is required.
 
 ### 2.7 Article Management (`/admin/articles`)
 - Create, update, publish, unpublish, delete.
@@ -94,9 +129,21 @@ This guide documents the current admin capabilities and the concrete implementat
   - Client-side image compression before embed.
   - Link normalization.
 
+#### Quick admin steps
+1. Open `/admin/articles` and create or select an article to edit.
+2. Write content in rich text editor and insert media/links as needed.
+3. Save, then publish/unpublish based on release status.
+4. Delete obsolete articles when required.
+
 ### 2.8 Media Management (`/admin/media`)
 - Admin mode media grid with create/edit/delete behaviors for media posts.
 - Uses the shared media module UI with admin controls enabled.
+
+#### Quick admin steps
+1. Open `/admin/media`.
+2. Create or edit media posts from admin mode controls.
+3. Delete outdated posts.
+4. Verify the public media page reflects updates.
 
 ### 2.9 Training Administration (`/admin/training`)
 - Category CRUD.
@@ -106,6 +153,12 @@ This guide documents the current admin capabilities and the concrete implementat
 - Category notes CRUD.
 - Note document upload support.
 - Breadcrumb-based navigation through categories, notes, and videos.
+
+#### Quick admin steps
+1. Open `/admin/training` and create/select a category.
+2. Import playlists using YouTube playlist URL.
+3. Manage notes and upload note documents.
+4. Use breadcrumbs to switch between categories, videos, and notes.
 
 ### 2.10 Consulting Management (`/admin/consulting`)
 - Consulting services CRUD with active/inactive control.
@@ -122,6 +175,13 @@ This guide documents the current admin capabilities and the concrete implementat
   - Mail client handoff and copy support.
 - Note: `assigned_to` was removed from the request workflow and is no longer part of the admin UI/API updates.
 
+#### Quick admin steps
+1. Open `/admin/consulting` and create/edit service content.
+2. Toggle `is_active` based on publishing needs.
+3. Open request detail to review message and attachments.
+4. Update request workflow fields: `status`, `priority`, and `notes`.
+5. Use email templates for faster response drafting.
+
 ### 2.11 Consulting Analytics (`/admin/consulting/analytics`)
 - Summary cards:
   - Total views.
@@ -135,6 +195,13 @@ This guide documents the current admin capabilities and the concrete implementat
 - Trend charts scoped to selected period.
 - Service conversion table and top-services lists.
 - Auto-refresh (60s) and manual refresh button.
+
+#### Quick admin steps
+1. Open `/admin/consulting/analytics`.
+2. Select period (`Last 7 Days`, `Last 30 Days`, or `All Time`).
+3. Review cards for views, requests, conversion, and unique-view context.
+4. Review trend charts and service conversion table.
+5. Click `Refresh Analytics` when manual refresh is needed.
 
 ## 3. Data Export and File Features
 

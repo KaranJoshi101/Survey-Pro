@@ -621,8 +621,8 @@ const AdminConsultingPage = () => {
                             {services.map((service) => (
                                 <div key={service.id} className="card" style={{ margin: 0 }}>
                                     <div className="card-body">
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
-                                            <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                                            <div style={{ flex: '1 1 240px', minWidth: 0 }}>
                                                 <h3 style={{ marginTop: 0 }}>{service.title}</h3>
                                                 <p style={{ color: '#555', margin: '0 0 8px 0' }}>{service.short_description}</p>
                                                 <p style={{ color: '#888', margin: 0, fontSize: '0.9rem' }}>
@@ -632,7 +632,7 @@ const AdminConsultingPage = () => {
                                             {renderServiceStatusBadge(service.is_active)}
                                         </div>
 
-                                        <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
                                             <button type="button" className="btn btn-primary" onClick={() => openEdit(service)}>Edit</button>
                                             <button
                                                 type="button"
@@ -772,7 +772,7 @@ const AdminConsultingPage = () => {
                                     <button type="button" className="btn btn-secondary" onClick={closeRequestModal}>Close</button>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                                <div className="responsive-two-col-grid" style={{ gap: '16px', marginBottom: '16px' }}>
                                     <div>
                                         <p style={{ margin: 0, color: '#666', fontSize: '0.85rem' }}>Name</p>
                                         <p style={{ margin: '4px 0 0 0', fontWeight: 600 }}>{selectedRequest.name}</p>
@@ -818,7 +818,7 @@ const AdminConsultingPage = () => {
                                 <div className="card" style={{ marginBottom: '16px' }}>
                                     <div className="card-body">
                                         <h3 style={{ marginTop: 0 }}>Internal Workflow</h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px' }}>
+                                        <div className="responsive-two-col-grid" style={{ gap: '12px' }}>
                                             <div className="form-group">
                                                 <label htmlFor="req-status">Status</label>
                                                 <select

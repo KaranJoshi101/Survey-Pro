@@ -356,7 +356,7 @@ const AdminAnalyticsPage = () => {
                 <div className="card" style={{ maxWidth: '100%' }}>
                     <div className="card-body">
                         <h2>Page Views Over Time (30 Days)</h2>
-                        <div style={{ height: '300px' }}>
+                        <div className="admin-chart-canvas compact">
                             <Line data={pageViewTrendData} options={lineOptions} />
                         </div>
                     </div>
@@ -364,7 +364,7 @@ const AdminAnalyticsPage = () => {
                 <div className="card" style={{ maxWidth: '100%' }}>
                     <div className="card-body">
                         <h2>Content & Module Views Over Time (30 Days)</h2>
-                        <div style={{ height: '300px' }}>
+                        <div className="admin-chart-canvas compact">
                             <Line data={engagementTrendData} options={lineOptions} />
                         </div>
                     </div>
@@ -374,7 +374,7 @@ const AdminAnalyticsPage = () => {
             <div className="card" style={{ marginBottom: '20px' }}>
                 <div className="card-body">
                     <h2>Conversion Events Over Time (30 Days)</h2>
-                    <div style={{ height: '300px' }}>
+                    <div className="admin-chart-canvas compact">
                         <Line data={conversionTrendData} options={lineOptions} />
                     </div>
                 </div>
@@ -440,7 +440,7 @@ const AdminAnalyticsPage = () => {
                         <p style={{ margin: 0, color: '#666' }}>No module activity recorded yet.</p>
                     ) : (
                         <div className="admin-chart-grid">
-                            <div style={{ height: '330px' }}>
+                            <div className="admin-chart-canvas">
                                 <Doughnut data={moduleChartData} options={moduleChartOptions} />
                             </div>
                             <div style={{ overflowX: 'auto' }}>
