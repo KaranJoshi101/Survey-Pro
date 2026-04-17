@@ -3,12 +3,12 @@
 UPDATE users 
 SET role = 'user', 
     bio = 'Market research director with 15+ years experience in consumer insights.'
-WHERE email = 'yuki.tanaka@corp.jp';
+WHERE email = 'user06@example.test';
 
 -- Update Manoj Kumar's bio to reflect he is the admin
 UPDATE users 
 SET bio = 'Assistant Professor specializing in biostatistics, health economics, and applied data analysis.'
-WHERE email = 'manojkumar@jnu.ac.in';
+WHERE email = 'admin@example.test';
 
 -- Update all surveys to be created by admin (user 1 - Manoj Kumar)
 UPDATE surveys SET created_by = 1 WHERE created_by != 1;

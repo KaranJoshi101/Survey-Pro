@@ -11,7 +11,7 @@ const pool = new Pool({
 
 const updatePassword = async () => {
     try {
-        const targetEmail = 'manojkumar@jnu.ac.in';
+        const targetEmail = 'admin@example.test';
         const targetPasswordHash = '$2a$10$LVtW6aDEwsV3Flu9c1tLCuw7CkHoQrP5KcnzqRrs3913Iml1xs9iG';
 
         const result = await pool.query(

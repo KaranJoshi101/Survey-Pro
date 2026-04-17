@@ -4,21 +4,21 @@
 -- Admin password: manoj123 (row 1 hash)
 -- Default user password: admin123 (remaining rows hash)
 INSERT INTO users (name, email, password_hash, role, location, age, gender, phone, bio) VALUES
-('Manoj Kumar', 'manojkumar@jnu.ac.in', '$2a$10$LVtW6aDEwsV3Flu9c1tLCuw7CkHoQrP5KcnzqRrs3913Iml1xs9iG', 'admin', 'New Delhi, India', 39, 'Male', '+91-99903-46151', 'Assistant Professor specializing in biostatistics, health economics, and applied data analysis.'),
-('Marcus Johnson', 'marcus.j@healthcare.com', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Chicago, IL', 45, 'Male', '+1-312-555-0102', 'Healthcare administrator interested in patient satisfaction surveys.'),
-('Priya Patel', 'priya.patel@tech.com', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Austin, TX', 28, 'Female', '+1-512-555-0103', 'UX researcher exploring new survey methodologies.'),
-('Ahmed Al-Rashid', 'ahmed.rashid@consulting.ae', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Dubai, UAE', 38, 'Male', '+971-4-555-0104', 'Business consultant specializing in customer feedback analysis.'),
-('Emily Rodriguez', 'emily.r@university.edu', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Boston, MA', 26, 'Female', '+1-617-555-0105', 'PhD candidate researching social survey methods and engagement.'),
-('Yuki Tanaka', 'yuki.tanaka@corp.jp', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Tokyo, Japan', 41, 'Non-binary', '+81-3-555-0106', 'Market research director with 15+ years experience in consumer insights.'),
-('David Okonkwo', 'david.o@startup.ng', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Lagos, Nigeria', 29, 'Male', '+234-1-555-0107', 'Startup founder building community engagement platforms.'),
-('Sofia Andersson', 'sofia.a@design.se', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Stockholm, Sweden', 34, 'Female', '+46-8-555-0108', 'Design strategist focused on user feedback loops.'),
-('James Williams', 'james.w@retail.com', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'London, UK', 52, 'Male', '+44-20-555-0109', 'Retail operations manager using surveys for store performance tracking.'),
-('Isabella Costa', 'isabella.costa@nonprofit.br', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'São Paulo, Brazil', 31, 'Female', '+55-11-555-0110', 'Non-profit coordinator measuring community impact through surveys.'),
-('Liam O''Connor', 'liam.oconnor@agency.ie', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Dublin, Ireland', 37, 'Male', '+353-1-555-0111', 'Marketing agency director specializing in brand perception studies.'),
-('Mei Zhang', 'mei.zhang@finance.cn', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Shanghai, China', 43, 'Female', '+86-21-555-0112', 'Financial analyst conducting employee satisfaction surveys.'),
-('Alex Thompson', 'alex.t@education.ca', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Toronto, Canada', 24, 'Non-binary', '+1-416-555-0113', 'Junior analyst learning survey design and data visualization.'),
-('Fatima Hassan', 'fatima.hassan@research.qa', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Doha, Qatar', 36, 'Female', '+974-4-555-0114', 'Survey researcher studying cross-cultural response patterns.'),
-('Oliver Schmidt', 'oliver.schmidt@manufacturing.de', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Munich, Germany', 48, 'Male', '+49-89-555-0115', 'Quality control manager using surveys for process improvement.')
+('Manoj Kumar', 'admin@example.test', '$2a$10$LVtW6aDEwsV3Flu9c1tLCuw7CkHoQrP5KcnzqRrs3913Iml1xs9iG', 'admin', 'New Delhi, India', 39, 'Male', '+1-555-0101', 'Assistant Professor specializing in biostatistics, health economics, and applied data analysis.'),
+('Marcus Johnson', 'user02@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Chicago, IL', 45, 'Male', '+1-555-0102', 'Healthcare administrator interested in patient satisfaction surveys.'),
+('Priya Patel', 'user03@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Austin, TX', 28, 'Female', '+1-555-0103', 'UX researcher exploring new survey methodologies.'),
+('Ahmed Al-Rashid', 'user04@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Dubai, UAE', 38, 'Male', '+1-555-0104', 'Business consultant specializing in customer feedback analysis.'),
+('Emily Rodriguez', 'user05@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Boston, MA', 26, 'Female', '+1-555-0105', 'PhD candidate researching social survey methods and engagement.'),
+('Yuki Tanaka', 'user06@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Tokyo, Japan', 41, 'Non-binary', '+1-555-0106', 'Market research director with 15+ years experience in consumer insights.'),
+('David Okonkwo', 'user07@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Lagos, Nigeria', 29, 'Male', '+1-555-0107', 'Startup founder building community engagement platforms.'),
+('Sofia Andersson', 'user08@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Stockholm, Sweden', 34, 'Female', '+1-555-0108', 'Design strategist focused on user feedback loops.'),
+('James Williams', 'user09@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'London, UK', 52, 'Male', '+1-555-0109', 'Retail operations manager using surveys for store performance tracking.'),
+('Isabella Costa', 'user10@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'São Paulo, Brazil', 31, 'Female', '+1-555-0110', 'Non-profit coordinator measuring community impact through surveys.'),
+('Liam O''Connor', 'user11@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Dublin, Ireland', 37, 'Male', '+1-555-0111', 'Marketing agency director specializing in brand perception studies.'),
+('Mei Zhang', 'user12@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Shanghai, China', 43, 'Female', '+1-555-0112', 'Financial analyst conducting employee satisfaction surveys.'),
+('Alex Thompson', 'user13@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Toronto, Canada', 24, 'Non-binary', '+1-555-0113', 'Junior analyst learning survey design and data visualization.'),
+('Fatima Hassan', 'user14@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Doha, Qatar', 36, 'Female', '+1-555-0114', 'Survey researcher studying cross-cultural response patterns.'),
+('Oliver Schmidt', 'user15@example.test', '$2a$10$S9cRWL3rZ6MrvmE1FmXb2eGv1EDjEMJ86aAtHaGVaF98OJ0pcXCSq', 'user', 'Munich, Germany', 48, 'Male', '+1-555-0115', 'Quality control manager using surveys for process improvement.')
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert diverse surveys

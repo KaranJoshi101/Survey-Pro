@@ -1,11 +1,11 @@
 # Survey App - Complete Project Documentation
 
-Version: 1.1
-Last Updated: 2026-03-29 (Admin docs + consulting analytics period updates)
+Version: 1.2
+Last Updated: 2026-03-30 (Runtime/config and API documentation sync)
 
 ## 1. Project Overview
 
-Survey App is a full-stack PERN platform for creating surveys, collecting responses, publishing articles/media/training content, and managing users through an admin dashboard.
+Survey App is a full-stack PERN platform for creating surveys, collecting responses, publishing articles/media/training content, offering consulting services with lead capture, and managing users through an admin dashboard.
 
 ### Primary Goals
 - Support secure registration/login with role-based access.
@@ -25,13 +25,16 @@ Survey App is a full-stack PERN platform for creating surveys, collecting respon
 
 ```text
 survey-app/
-  client/                  React frontend
-  server/                  Express API
+  client/                  React frontend (CRA + CRACO)
+  server/                  Express API and uploads
   database/                DB scripts/migrations/seeds
   docs/                    Documentation
-  scripts/                 Utility scripts (for example smoke tests)
+  scripts/                 Utility scripts (for example smoke tests, DB sync)
+  backups/                 DB backup artifacts
   logs/                    Runtime logs
   ecosystem.config.js      PM2 config
+  DEPLOYMENT.md            Production deployment runbook
+  QUICK_START.md           Quick-start guide
 ```
 
 ## 3. Runtime Architecture
@@ -42,6 +45,8 @@ survey-app/
 - API base path: /api
 - Health: /api/health
 - DB health: /api/health/db
+- Frontend dev proxy default: http://localhost:5000 (from client/package.json `proxy`)
+- Frontend explicit API base (when configured): REACT_APP_API_URL (for example http://localhost:5000/api)
 
 ### Backend Route Mounts
 - /api/auth
@@ -52,6 +57,7 @@ survey-app/
 - /api/media
 - /api/training
 - /api/consulting
+- /api/analytics
 - /uploads (static files, runtime uploads)
 
 ### Security and Middleware (server)
@@ -242,7 +248,7 @@ Includes checks for health, login, and build artifacts.
 - client: run frontend dev mode
 - build: build frontend
 - smoke: run smoke test script
-- start/start:server: run backend production mode
+- start and start:server: run backend production mode
 - pm2:start | pm2:restart | pm2:stop
 - db:init: initialize DB
 - db:sync:prod: backup production, sync local DB to production, verify core table counts
@@ -267,38 +273,39 @@ Additional operational script:
 ## 10. API Summary
 
 Authentication:
-- POST /auth/register
-- POST /auth/login
-- GET /auth/me
+- POST /api/auth/register
+- POST /api/auth/login
+- GET /api/auth/me
 
 Surveys:
-- GET /surveys
-- GET /surveys/:id
-- POST /surveys (admin)
-- PUT /surveys/:id (admin)
-- DELETE /surveys/:id (admin)
-- POST /surveys/:surveyId/questions (admin)
-- POST /surveys/questions/:questionId/options (admin)
+- GET /api/surveys
+- GET /api/surveys/:id
+- POST /api/surveys (admin)
+- PUT /api/surveys/:id (admin)
+- DELETE /api/surveys/:id (admin)
+- POST /api/surveys/:surveyId/questions (admin)
+- POST /api/surveys/questions/:questionId/options (admin)
 
 Responses:
-- POST /responses
-- GET /responses/survey/:surveyId
-- GET /responses/:responseId
-- GET /responses/survey/:surveyId/analytics
+- POST /api/responses
+- GET /api/responses/survey/:surveyId
+- GET /api/responses/:responseId
+- GET /api/responses/survey/:surveyId/analytics
 
 Articles:
-- GET /articles
-- GET /articles/:id
-- POST /articles (admin)
-- PUT /articles/:id (admin)
-- DELETE /articles/:id (admin)
-- GET /articles/admin/my-articles (admin)
+- GET /api/articles
+- GET /api/articles/:id
+- POST /api/articles (admin)
+- PUT /api/articles/:id (admin)
+- DELETE /api/articles/:id (admin)
+- GET /api/articles/admin/my-articles (admin)
 
 Additional modules:
-- Users API under /users
-- Media API under /media
-- Training API under /training
-- Consulting API under /consulting
+- Users API under /api/users
+- Media API under /api/media
+- Training API under /api/training
+- Consulting API under /api/consulting
+- Analytics API under /api/analytics
 
 Consulting API capabilities now include:
 - Public services list and detail retrieval.
@@ -328,6 +335,7 @@ Primary references in docs/:
 
 Root references:
 - README.md: Quick onboarding summary
+- QUICK_START.md: Fast local startup checklist
 - SETUP.md: Detailed local setup
 - DEPLOYMENT.md: Production deployment runbook
 - IMPLEMENTATION_STATUS.md: Build progress tracking

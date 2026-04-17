@@ -413,11 +413,11 @@ const LandingPage = () => {
                                 <div className="contact-text">
                                     <h3>Email</h3>
                                     <p>
-                                        <a href="mailto:manojkumardiwakar@jnu.ac.in">manojkumardiwakar@jnu.ac.in</a>
+                                        <a href="mailto:contact.primary@example.test">contact.primary@example.test</a>
                                         <br />
-                                        <a href="mailto:mak851@pitt.edu">mak851@pitt.edu</a>
+                                        <a href="mailto:contact.secondary@example.test">contact.secondary@example.test</a>
                                         <br />
-                                        <a href="mailto:manojdiwakarstat@gmail.com">manojdiwakarstat@gmail.com</a>
+                                        <a href="mailto:contact.tertiary@example.test">contact.tertiary@example.test</a>
                                     </p>
                                 </div>
                             </div>
@@ -436,8 +436,8 @@ const LandingPage = () => {
                                 <div className="contact-icon"><FaMapMarkerAlt aria-hidden="true" /></div>
                                 <div className="contact-text">
                                     <h3>Address</h3>
-                                    <p>777 Hazelwood Ave<br />
-                                        Pittsburgh, PA 15217, USA
+                                    <p>123 Research Avenue<br />
+                                        Example City, EX 12345, USA
                                     </p>
                                 </div>
                             </div>
@@ -445,7 +445,7 @@ const LandingPage = () => {
                                 <div className="contact-icon"><FaPhoneAlt aria-hidden="true" /></div>
                                 <div className="contact-text">
                                     <h3>Phone</h3>
-                                    <p>+1 412-589-8944
+                                    <p>+1 555-0100
                                     </p>
                                 </div>
                             </div>
@@ -454,7 +454,7 @@ const LandingPage = () => {
                         <div className="acad-contact-links">
                             <h2>Professional Profiles</h2>
                             <a
-                                href="https://www.linkedin.com/in/drmanojkumardiwakarstatisticianprofessoratjnu/"
+                                href="https://www.linkedin.com/in/example-research-profile/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="acad-link-btn"
@@ -463,7 +463,7 @@ const LandingPage = () => {
                                 LinkedIn
                             </a>
                             <a
-                                href="https://orcid.org/0000-0001-6444-8160"
+                                href="https://orcid.org/0000-0000-0000-0000"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="acad-link-btn"
@@ -505,7 +505,7 @@ const LandingPage = () => {
                         <div>
                             <h4>Contact</h4>
                             <ul className="acad-footer-links">
-                                <li><a href="mailto:manojkumar@jnu.ac.in">manojkumar@jnu.ac.in</a></li>
+                                <li><a href="mailto:contact@example.test">contact@example.test</a></li>
                                 {/* <li><button type="button" onClick={() => scrollToSection('media')}>Media &amp; Talks</button></li> */}
                                 <li><button type="button" onClick={() => scrollToSection('contact')}>Contact Info</button></li>
                                 <li><Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>Login</Link></li>
