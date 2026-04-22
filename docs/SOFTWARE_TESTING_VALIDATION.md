@@ -130,43 +130,27 @@ This report provides formal evidence of manual testing and validation completed 
 | NB-02 | TC-UI-002 | Minor text/CTA overlap on narrow mobile width in consulting hero section | Low | Non-blocking; CTA remained accessible |
 | NB-03 | TC-PERF-001 | Noticeable initial thumbnail render delay on mobile data in media feed | Low | Non-blocking; page remained usable |
 
-## 9. Evidence Register (Descriptive)
-
-| Evidence ID | Related Test ID(s) | Evidence Type | Description |
-|---|---|---|---|
-| EV-001 | TC-AUTH-001 | Screenshot | Login success state showing authenticated landing page |
-| EV-002 | TC-AUTH-002 | Screenshot | Invalid credentials message on login form |
-| EV-003 | TC-SRV-003 | Screenshot | Survey submission confirmation after valid response |
-| EV-004 | TC-SRV-004 | Screenshot/API capture | Duplicate submission prevention message and rejected second attempt |
-| EV-005 | TC-CON-003 | Screenshot | Inline validation messages for required consultation fields |
-| EV-006 | TC-SEC-001 | Postman response capture | Unauthorized response for protected endpoint without token |
-| EV-007 | TC-ADM-002 | Screen recording note | Analytics filter behavior showing delayed active-chip highlight |
-| EV-008 | TC-UI-002 | Screenshot (mobile viewport) | Slight overlap between hero subtitle wrap and CTA area |
-| EV-009 | TC-PERF-001 | DevTools network timeline note | Delayed media thumbnail rendering on initial mobile-data load |
-
-## 10. Tools Used
+## 9. Tools Used
 
 - Postman for API request and response verification
 - Chrome DevTools for network/console inspection and viewport testing
-- Lighthouse for qualitative performance and best-practice review
-- Edge and Firefox developer tools for cross-browser behavior checks
 - Manual test execution log for case-by-case outcome tracking
 
-## 11. Performance Observations (Qualitative)
+## 10. Performance Observations (Qualitative)
 
 - Core pages (login, surveys list, survey detail, dashboard) loaded without noticeable delay impacting basic navigation or interaction on desktop browsers.
 - On mobile data, initial media feed thumbnail rendering showed a visible delay during first load, while text content appeared earlier.
 - No complete UI freeze or hard navigation failure was observed during performance-focused manual checks.
 - Performance evaluation in this cycle was observational and tool-assisted; no benchmark-grade timing dataset was collected.
 
-## 12. Limitations
+## 11. Limitations
 
 - Testing was manual and scenario-based; no automated regression suite was executed.
 - Observed behavior reflects sampled sessions across selected browsers/devices, not exhaustive device coverage.
 - Performance assessment was qualitative; no controlled load test campaign was performed.
 - Security verification was limited to application-level checks and did not include external penetration testing.
 
-## 13. Conclusion
+## 12. Conclusion
 
 The deployed Survey App demonstrates stable behavior across core functional flows, role-based access control, validation handling, and primary content/consulting workflows within the defined test scope.
 

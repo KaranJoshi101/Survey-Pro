@@ -141,7 +141,7 @@ const AdminResponsesPage = () => {
 
     return (
         <div className="container mt-4">
-            <BackLink to="/admin/surveys" label="Back to Manage Surveys" />
+            <BackLink to="/admin/surveys" label="Back to Manage Surveys and Feedbacks" />
             <h1 style={{ color: '#003594' }}>Survey Responses & Analytics</h1>
 
             {error && <div className="alert alert-danger">{error}</div>}

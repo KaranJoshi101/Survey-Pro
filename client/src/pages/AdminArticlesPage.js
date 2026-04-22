@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import articleService from '../services/articleService';
+import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
 
@@ -98,6 +99,7 @@ const AdminArticlesPage = () => {
     const [success, setSuccess] = useState('');
     const [deleting, setDeleting] = useState(null);
     const [publishing, setPublishing] = useState(null);
+    const [talkSummaryArticleIds, setTalkSummaryArticleIds] = useState(new Set());
 
     // Form states
     const [showForm, setShowForm] = useState(false);
@@ -106,6 +108,9 @@ const AdminArticlesPage = () => {
     const [content, setContent] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const quillRef = useRef(null);
+
+    const articleCount = articles.filter((article) => !talkSummaryArticleIds.has(Number(article.id))).length;
+    const talksCount = articles.filter((article) => talkSummaryArticleIds.has(Number(article.id))).length;
 
     const handleImageInsert = useCallback(() => {
         const input = document.createElement('input');
@@ -154,8 +159,20 @@ const AdminArticlesPage = () => {
     const fetchArticles = useCallback(async () => {
         try {
             setLoading(true);
-            const response = await articleService.getAdminArticles(1, 100);
-            setArticles(response.data.articles);
+            const [articlesResponse, mediaResponse] = await Promise.all([
+                articleService.getAdminArticles(1, 100),
+                api.get('/media', { params: { limit: 500 } }),
+            ]);
+
+            const mediaPosts = Array.isArray(mediaResponse.data?.posts) ? mediaResponse.data.posts : [];
+            const attachedArticleIds = new Set(
+                mediaPosts
+                    .map((post) => Number(post.article_id))
+                    .filter((id) => Number.isInteger(id) && id > 0)
+            );
+
+            setTalkSummaryArticleIds(attachedArticleIds);
+            setArticles(articlesResponse.data.articles);
             setError('');
         } catch (err) {
             setError('Failed to load articles');
@@ -301,7 +318,23 @@ const AdminArticlesPage = () => {
     return (
         <div className="container mt-4">
             <BackLink to="/admin" label="Back to Admin" />
-            <h1 style={{ color: '#003594' }}>Manage Articles</h1>
+            <h1 style={{ color: '#003594' }}>Manage Articles and Talks</h1>
+
+            <div className="admin-chip-row" style={{ marginBottom: '12px' }}>
+                <span className="admin-chip total">Total: {articles.length}</span>
+                <span
+                    className="admin-chip"
+                    style={{ backgroundColor: '#e8f0ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}
+                >
+                    Articles: {articleCount}
+                </span>
+                <span
+                    className="admin-chip"
+                    style={{ backgroundColor: '#fff4db', color: '#b45309', border: '1px solid #fcd34d' }}
+                >
+                    Talks: {talksCount}
+                </span>
+            </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
             {success && <div className="alert alert-success">{success}</div>}
@@ -374,18 +407,20 @@ const AdminArticlesPage = () => {
 
             {/* Articles List */}
             <div style={{ marginBottom: '32px' }}>
-                <h2 style={{ color: '#003594' }}>Your Articles ({articles.length})</h2>
+                <h2 style={{ color: '#003594' }}>Your Articles and Talks ({articles.length})</h2>
                 {articles.length === 0 ? (
                     <div className="card" style={{ textAlign: 'center', padding: '40px' }}>
-                        <p style={{ color: '#666' }}>No articles created yet</p>
+                        <p style={{ color: '#666' }}>No articles or talks created yet</p>
                     </div>
                 ) : (
                     <div style={{ maxWidth: '800px' }}>
-                        {articles.map((article) => (
+                        {articles.map((article) => {
+                            const isTalk = talkSummaryArticleIds.has(Number(article.id));
+                            return (
                             <div
                                 key={article.id}
                                 className="card"
-                                style={{ marginBottom: '16px' }}
+                                style={{ marginBottom: '16px', border: isTalk ? '1px solid #fcd34d' : '1px solid #bfdbfe' }}
                             >
                                 <div className="card-body">
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
@@ -407,6 +442,19 @@ const AdminArticlesPage = () => {
                                             }}
                                         >
                                             {article.is_published ? 'Published' : 'Draft'}
+                                        </span>
+                                        <span
+                                            style={{
+                                                backgroundColor: isTalk ? '#fff4db' : '#e8f0ff',
+                                                color: isTalk ? '#b45309' : '#1d4ed8',
+                                                border: isTalk ? '1px solid #fcd34d' : '1px solid #bfdbfe',
+                                                padding: '4px 8px',
+                                                borderRadius: '4px',
+                                                fontSize: '0.85rem',
+                                                fontWeight: 'bold',
+                                            }}
+                                        >
+                                            {isTalk ? 'Talk' : 'Article'}
                                         </span>
                                     </div>
 
@@ -454,7 +502,8 @@ const AdminArticlesPage = () => {
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

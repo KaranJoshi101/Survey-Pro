@@ -295,7 +295,7 @@ const AdminDashboardPage = () => {
                     <h2>Management</h2>
                     <div className="admin-management-grid">
                         <Link to="/admin/surveys" className="admin-management-link">
-                            <strong>Manage Surveys</strong>
+                            <strong>Manage Surveys and Feedbacks</strong>
                             <span>Create, publish, analyze, and export.</span>
                         </Link>
                         <Link to="/admin/users" className="admin-management-link">
@@ -303,7 +303,7 @@ const AdminDashboardPage = () => {
                             <span>Search users, review details, ban/unban.</span>
                         </Link>
                         <Link to="/admin/articles" className="admin-management-link">
-                            <strong>Manage Articles</strong>
+                            <strong>Manage Articles and Talks</strong>
                             <span>Write, edit, publish, and retire content.</span>
                         </Link>
                         <Link to="/admin/media" className="admin-management-link">

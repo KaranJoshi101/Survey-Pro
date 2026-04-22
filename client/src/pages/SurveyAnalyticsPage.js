@@ -295,7 +295,7 @@ const SurveyAnalyticsPage = () => {
         return (
             <div className="container mt-4">
                 <div className="alert alert-danger">{error}</div>
-                <Link to="/admin/surveys" className="btn btn-primary">Back to Manage Surveys</Link>
+                <Link to="/admin/surveys" className="btn btn-primary">Back to Manage Surveys and Feedbacks</Link>
             </div>
         );
     }
@@ -321,7 +321,7 @@ const SurveyAnalyticsPage = () => {
                 <h1 style={{ margin: 0 }}>Analytics: {analytics.survey_title}</h1>
                 <Link to="/admin/surveys" className="btn btn-secondary"
                     style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
-                    Back to Manage Surveys
+                    Back to Manage Surveys and Feedbacks
                 </Link>
             </div>
 

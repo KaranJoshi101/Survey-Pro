@@ -389,7 +389,7 @@ const CreateSurveyPage = () => {
         <div className="container mt-4" style={{ maxWidth: '980px' }}>
             <Link to="/admin/surveys" style={{ color: '#003594', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                 <FaArrowLeft size={12} aria-hidden="true" />
-                Back to Manage Surveys
+                Back to Manage Surveys and Feedbacks
             </Link>
 
             <div className="card mt-3">

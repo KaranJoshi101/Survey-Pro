@@ -16,6 +16,8 @@ const AdminSurveysPage = () => {
 
     const publishedCount = surveys.filter((s) => s.status === 'published').length;
     const draftCount = surveys.filter((s) => s.status === 'draft').length;
+    const surveyCount = surveys.filter((s) => !Boolean(s.is_feedback)).length;
+    const feedbackCount = surveys.filter((s) => Boolean(s.is_feedback)).length;
     const filteredSurveys = surveys.filter((s) =>
         String(s.title || '').toLowerCase().includes(searchTerm.trim().toLowerCase())
     );
@@ -122,8 +124,8 @@ const AdminSurveysPage = () => {
             <BackLink to="/admin" label="Back to Admin" />
             <div className="admin-page-header">
                 <div>
-                    <h1 style={{ marginBottom: '6px' }}>Manage Surveys</h1>
-                    <p style={{ margin: 0 }}>Centralized control for survey lifecycle and reporting.</p>
+                    <h1 style={{ marginBottom: '6px' }}>Manage Surveys and Feedbacks</h1>
+                    <p style={{ margin: 0 }}>Centralized control for survey and feedback lifecycle and reporting.</p>
                 </div>
                 <div className="admin-page-actions">
                     <Link to="/admin/surveys/create" className="btn btn-success">
@@ -143,6 +145,18 @@ const AdminSurveysPage = () => {
                 </span>
                 <span className="admin-chip draft">
                     Draft: {draftCount}
+                </span>
+                <span
+                    className="admin-chip"
+                    style={{ backgroundColor: '#e8f0ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}
+                >
+                    Surveys: {surveyCount}
+                </span>
+                <span
+                    className="admin-chip"
+                    style={{ backgroundColor: '#fff4db', color: '#b45309', border: '1px solid #fcd34d' }}
+                >
+                    Feedbacks: {feedbackCount}
                 </span>
             </div>
 
@@ -169,6 +183,7 @@ const AdminSurveysPage = () => {
                         <thead>
                             <tr>
                                 <th>Title</th>
+                                <th>Type</th>
                                 <th>Status</th>
                                 <th>Questions</th>
                                 <th>Created</th>
@@ -180,6 +195,18 @@ const AdminSurveysPage = () => {
                                 <tr key={survey.id}>
                                     <td className="admin-cell">
                                         <strong>{survey.title}</strong>
+                                    </td>
+                                    <td className="admin-cell">
+                                        <span
+                                            className="badge"
+                                            style={
+                                                survey.is_feedback
+                                                    ? { backgroundColor: '#fff4db', color: '#b45309', border: '1px solid #fcd34d' }
+                                                    : { backgroundColor: '#e8f0ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }
+                                            }
+                                        >
+                                            {survey.is_feedback ? 'Feedback' : 'Survey'}
+                                        </span>
                                     </td>
                                     <td className="admin-cell">
                                         <span className={`badge ${survey.status === 'published' ? 'badge-published' : 'badge-draft'}`}>
