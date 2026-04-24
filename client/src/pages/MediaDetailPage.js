@@ -188,7 +188,7 @@ const MediaDetailPage = () => {
                                     fontWeight: 700,
                                 }}
                             >
-                                Linked Article
+                                Linked Talk
                             </span>
                         )}
                         {survey && (
@@ -272,7 +272,7 @@ const MediaDetailPage = () => {
                                     borderBottom: survey ? '1px solid #E7EDF6' : 'none',
                                 }}
                             >
-                                <h3 style={{ color: '#003594', marginBottom: '12px', marginTop: 0 }}>Article</h3>
+                                <h3 style={{ color: '#003594', marginBottom: '12px', marginTop: 0 }}>Talk</h3>
                                 <h4 style={{ color: '#1F2D48', marginBottom: '10px' }}>{article.title}</h4>
                                 <p style={{ color: '#888', marginBottom: '16px' }}>
                                     By <strong>{article.author_name}</strong> · {new Date(article.created_at).toLocaleDateString()}

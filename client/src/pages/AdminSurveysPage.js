@@ -14,8 +14,15 @@ const AdminSurveysPage = () => {
     const [exporting, setExporting] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const publishedCount = surveys.filter((s) => s.status === 'published').length;
-    const draftCount = surveys.filter((s) => s.status === 'draft').length;
+    const getEffectiveSurveyStatus = (survey) => {
+        if (survey?.is_feedback) {
+            return 'published';
+        }
+        return survey?.status === 'published' ? 'published' : 'draft';
+    };
+
+    const publishedCount = surveys.filter((s) => getEffectiveSurveyStatus(s) === 'published').length;
+    const draftCount = surveys.filter((s) => getEffectiveSurveyStatus(s) === 'draft').length;
     const surveyCount = surveys.filter((s) => !Boolean(s.is_feedback)).length;
     const feedbackCount = surveys.filter((s) => Boolean(s.is_feedback)).length;
     const filteredSurveys = surveys.filter((s) =>
@@ -77,6 +84,11 @@ const AdminSurveysPage = () => {
     const handleUnpublish = async (surveyId) => {
         try {
             setPublishing(surveyId);
+            const targetSurvey = surveys.find((s) => s.id === surveyId);
+            if (targetSurvey?.is_feedback) {
+                setError('Feedback surveys must remain published');
+                return;
+            }
             await surveyService.unpublishSurvey(surveyId);
             setSurveys(
                 surveys.map((s) =>
@@ -191,7 +203,11 @@ const AdminSurveysPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredSurveys.map((survey) => (
+                            {filteredSurveys.map((survey) => {
+                                const effectiveStatus = getEffectiveSurveyStatus(survey);
+                                const canUnpublish = effectiveStatus === 'published' && !survey.is_feedback;
+
+                                return (
                                 <tr key={survey.id}>
                                     <td className="admin-cell">
                                         <strong>{survey.title}</strong>
@@ -209,8 +225,8 @@ const AdminSurveysPage = () => {
                                         </span>
                                     </td>
                                     <td className="admin-cell">
-                                        <span className={`badge ${survey.status === 'published' ? 'badge-published' : 'badge-draft'}`}>
-                                            {survey.status}
+                                        <span className={`badge ${effectiveStatus === 'published' ? 'badge-published' : 'badge-draft'}`}>
+                                            {effectiveStatus}
                                         </span>
                                     </td>
                                     <td className="admin-cell" style={{ textAlign: 'center' }}>
@@ -240,7 +256,7 @@ const AdminSurveysPage = () => {
                                             >
                                                 {exporting === survey.id ? 'Exporting...' : 'Export'}
                                             </button>
-                                            {survey.status === 'draft' ? (
+                                            {effectiveStatus === 'draft' ? (
                                                 <button
                                                     onClick={() => handlePublish(survey.id)}
                                                     className="btn btn-success btn-compact"
@@ -252,7 +268,8 @@ const AdminSurveysPage = () => {
                                                 <button
                                                     onClick={() => handleUnpublish(survey.id)}
                                                     className="btn btn-warning btn-compact"
-                                                    disabled={publishing === survey.id}
+                                                    disabled={publishing === survey.id || !canUnpublish}
+                                                    title={!canUnpublish ? 'Feedback surveys must remain published' : ''}
                                                 >
                                                     {publishing === survey.id ? 'Unpublishing...' : 'Unpublish'}
                                                 </button>
@@ -267,7 +284,8 @@ const AdminSurveysPage = () => {
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

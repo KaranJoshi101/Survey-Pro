@@ -52,6 +52,9 @@ This guide documents the current admin capabilities and the concrete implementat
 - One-click survey response export to Excel.
 - Jump to survey analytics page.
 - Question count display per survey.
+- Linked survey behavior:
+  - If linked in media feed, survey becomes `Feedback` and is treated as published.
+  - Unpublish is disabled/rejected for linked Feedback items.
 
 #### Quick admin steps
 1. Open `/admin/surveys` and search by survey title if needed.
@@ -128,6 +131,9 @@ This guide documents the current admin capabilities and the concrete implementat
   - Formatting, lists, blockquote, code-block, links, images.
   - Client-side image compression before embed.
   - Link normalization.
+- Linked article behavior:
+  - If linked in media feed, article becomes `Talk` and is treated as published.
+  - Unpublish is disabled/rejected for linked Talk items.
 
 #### Quick admin steps
 1. Open `/admin/articles` and create or select an article to edit.
@@ -136,8 +142,13 @@ This guide documents the current admin capabilities and the concrete implementat
 4. Delete obsolete articles when required.
 
 ### 2.8 Media Management (`/admin/media`)
-- Admin mode media grid with create/edit/delete behaviors for media posts.
+- Admin mode media grid with create/edit/delete/publish/unpublish behaviors for media posts.
 - Uses the shared media module UI with admin controls enabled.
+- Media lifecycle:
+  - New standalone media posts start as `draft`.
+  - Admin can publish/unpublish media cards to control public visibility.
+  - When survey/article is linked, linked entity is auto-published as Feedback/Talk.
+  - Deleting the last media link reverts linked Feedback/Talk back to draft Survey/Article.
 
 #### Quick admin steps
 1. Open `/admin/media`.
@@ -202,6 +213,13 @@ This guide documents the current admin capabilities and the concrete implementat
 3. Review cards for views, requests, conversion, and unique-view context.
 4. Review trend charts and service conversion table.
 5. Click `Refresh Analytics` when manual refresh is needed.
+
+### 2.12 User Profile (`/profile`)
+- Authenticated users can update profile details.
+- Authenticated users can change password securely with:
+  - current password verification,
+  - strong new password validation,
+  - confirm password match check.
 
 ## 3. Data Export and File Features
 

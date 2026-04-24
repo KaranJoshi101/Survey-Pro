@@ -10,14 +10,16 @@ const {
     getDashboardStats,
     getProfile,
     updateProfile,
+    changePassword,
 } = require('../controllers/userController');
 const { authenticate, authorize } = require('../middleware/auth');
 const { validateRequest } = require('../middleware/validateRequest');
-const { idParam, paginationQuery, profileUpdateValidation } = require('../middleware/routeValidators');
+const { idParam, paginationQuery, profileUpdateValidation, changePasswordValidation } = require('../middleware/routeValidators');
 
 // Profile routes (any authenticated user) - must come before /:id routes
 router.get('/profile', authenticate, getProfile);
 router.put('/profile', authenticate, profileUpdateValidation, validateRequest, updateProfile);
+router.put('/profile/password', authenticate, changePasswordValidation, validateRequest, changePassword);
 
 // Admin routes require admin authentication
 router.get('/', authenticate, authorize, paginationQuery, validateRequest, getAllUsers);

@@ -175,6 +175,44 @@ const profileUpdateValidation = [
         .withMessage('bio must be at most 2000 characters'),
 ];
 
+const changePasswordValidation = isDev
+    ? [
+        body('current_password')
+            .isString()
+            .isLength({ min: 1, max: 128 })
+            .withMessage('current_password is required'),
+        body('new_password')
+            .isString()
+            .isLength({ min: 6, max: 128 })
+            .withMessage('new_password must be 6-128 characters long'),
+        body('confirm_new_password')
+            .isString()
+            .custom((value, { req }) => value === req.body.new_password)
+            .withMessage('confirm_new_password must match new_password'),
+      ]
+    : [
+        body('current_password')
+            .isString()
+            .isLength({ min: 1, max: 128 })
+            .withMessage('current_password is required'),
+        body('new_password')
+            .isString()
+            .isLength({ min: 10, max: 128 })
+            .withMessage('new_password must be 10-128 characters long')
+            .matches(/[a-z]/)
+            .withMessage('new_password must include a lowercase letter')
+            .matches(/[A-Z]/)
+            .withMessage('new_password must include an uppercase letter')
+            .matches(/[0-9]/)
+            .withMessage('new_password must include a number')
+            .matches(/[^A-Za-z0-9]/)
+            .withMessage('new_password must include a special character'),
+        body('confirm_new_password')
+            .isString()
+            .custom((value, { req }) => value === req.body.new_password)
+            .withMessage('confirm_new_password must match new_password'),
+      ];
+
 const submitResponseValidation = [
     body('survey_id')
         .isInt({ min: 1 })
@@ -363,6 +401,7 @@ module.exports = {
     surveyWriteValidation,
     articleWriteValidation,
     profileUpdateValidation,
+    changePasswordValidation,
     submitResponseValidation,
     consultingServiceWriteValidation,
     consultingRequestValidation,

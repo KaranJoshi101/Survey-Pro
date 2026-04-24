@@ -16,6 +16,9 @@ CREATE TABLE media_posts (
     image_url TEXT NOT NULL,
     size media_size DEFAULT 'medium',  -- 'small', 'medium', 'large'
     source media_source DEFAULT 'manual',  -- 'manual', 'linkedin'
+    status media_status DEFAULT 'draft',  -- 'draft', 'published'
+    survey_id INT NULL,
+    article_id INT NULL,
     external_id VARCHAR(255) UNIQUE,  -- For tracking LinkedIn posts
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -26,6 +29,7 @@ CREATE TABLE media_posts (
 
 - **media_size**: `small` (1x1), `medium` (2x1), `large` (2x2)
 - **media_source**: `manual`, `linkedin`
+- **media_status**: `draft`, `published`
 
 ### Indexes
 
@@ -38,6 +42,8 @@ CREATE TABLE media_posts (
 ### Endpoint: GET /api/media
 
 Fetch all media posts ordered by creation date (newest first).
+
+Only published media posts are returned to public clients.
 
 **Query Parameters:**
 - `limit` (optional, default: 50, max: 500) - Number of posts to return
@@ -71,9 +77,17 @@ Create a new media post manually.
   "description": "Optional description",
   "image_url": "https://example.com/image.jpg",
   "size": "medium",  // "small", "medium", or "large"
-  "source": "manual"  // "manual" or "linkedin"
+  "source": "manual",  // "manual" or "linkedin"
+  "status": "draft",   // optional: "draft" or "published"
+  "survey_id": null,
+  "article_id": null
 }
 ```
+
+Rules:
+- Standalone media defaults to `draft`.
+- If `survey_id` or `article_id` is set, media is auto-published.
+- Linked survey/article are auto-published as Feedback/Talk entities.
 
 **Response:**
 ```json
@@ -87,9 +101,32 @@ Create a new media post manually.
 
 Fetch a specific media post by ID.
 
+Public fetch returns only published media posts.
+
+### Endpoint: GET /api/media/admin/all (Admin Only)
+
+Fetch all media posts, including drafts.
+
+### Endpoint: PUT /api/media/:id/publish (Admin Only)
+
+Publish a media post.
+
+### Endpoint: PUT /api/media/:id/unpublish (Admin Only)
+
+Unpublish a media post.
+
+Notes:
+- Media card visibility can be toggled independently.
+- Linked Feedback/Talk entities stay published when media is unpublished.
+
 ### Endpoint: DELETE /api/media/:id (Admin Only)
 
 Delete a media post by ID.
+
+Notes:
+- If deleted media was the last link to a survey/article, that linked entity is reverted to draft state:
+  - survey status -> `draft`
+  - article `is_published` -> `false`
 
 ## Frontend
 
@@ -205,7 +242,7 @@ const mockPost = createMockLinkedInPost(0);
 
 ## Manual Post Submission
 
-Admin users can manually add media posts via the API or admin dashboard (to be implemented):
+Admin users can manually add media posts via the API or admin dashboard:
 
 ```bash
 curl -X POST http://localhost:5000/api/media \
@@ -263,7 +300,6 @@ curl -X POST http://localhost:5000/api/media \
 
 ## Future Enhancements
 
-- [ ] Admin dashboard for manual post creation UI
 - [ ] Instagram API integration
 - [ ] Twitter/X API integration
 - [ ] Image upload instead of URL only

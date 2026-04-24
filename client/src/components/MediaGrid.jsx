@@ -24,11 +24,14 @@ const MediaGridSkeleton = ({ count = 12 }) => {
  * MediaCard Component
  * Individual media post card with image, title, description, and source badge
  */
-const MediaCard = ({ post, isAdmin, onEdit, onDelete, actionLoading, clickable = false, onCardClick }) => {
+const MediaCard = ({ post, isAdmin, onEdit, onDelete, onTogglePublish, actionLoading, clickable = false, onCardClick }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [imageError, setImageError] = useState(false);
 
     const handleCardClick = () => {
+        if (isAdmin && post.status !== 'published') {
+            return;
+        }
         if (clickable) {
             onCardClick?.(post.id);
         }
@@ -43,6 +46,12 @@ const MediaCard = ({ post, isAdmin, onEdit, onDelete, actionLoading, clickable =
         e.stopPropagation();
         onDelete(post.id);
     };
+
+    const handlePublishClick = (e) => {
+        e.stopPropagation();
+        onTogglePublish(post);
+    };
+
 
     const getGridClass = () => {
         const sizeMap = {
@@ -77,6 +86,14 @@ const MediaCard = ({ post, isAdmin, onEdit, onDelete, actionLoading, clickable =
                     >
                         Delete
                     </button>
+                    <button
+                        type="button"
+                        className={`media-admin-btn ${post.status === 'published' ? 'media-admin-btn-unpublish' : 'media-admin-btn-publish'}`}
+                        onClick={handlePublishClick}
+                        disabled={actionLoading}
+                    >
+                        {post.status === 'published' ? 'Unpublish' : 'Publish'}
+                    </button>
                 </div>
             )}
             <div className="media-card-image-wrapper">
@@ -109,13 +126,18 @@ const MediaCard = ({ post, isAdmin, onEdit, onDelete, actionLoading, clickable =
                         )}
                         {(post.article_id || post.survey_id) && (
                             <div className="media-card-links" aria-label="Linked content">
-                                {post.article_id && <span className="media-card-link-chip">Article</span>}
+                                {post.article_id && <span className="media-card-link-chip">Talk</span>}
                                 {post.survey_id && <span className="media-card-link-chip">Feedback</span>}
                             </div>
                         )}
                     </div>
                 </div>
             </div>
+            {isAdmin && (
+                <div className={`media-status-badge media-status-${post.status || 'draft'}`}>
+                    {(post.status || 'draft').toUpperCase()}
+                </div>
+            )}
             <div className={getSourceBadgeClass()}>
                 {post.source === 'linkedin' ? 'LinkedIn' : 'Featured'}
             </div>
@@ -146,6 +168,7 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
         image_url: '',
         size: 'medium',
         source: 'manual',
+        status: 'draft',
         survey_id: null,
         article_id: null,
     });
@@ -157,6 +180,7 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
             image_url: '',
             size: 'medium',
             source: 'manual',
+            status: 'draft',
             survey_id: null,
             article_id: null,
         });
@@ -170,7 +194,8 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
             setLoading(true);
             setError(null);
 
-            const response = await api.get('/media', {
+            const endpoint = showAdminControls ? '/media/admin/all' : '/media';
+            const response = await api.get(endpoint, {
                 params: { limit },
             });
 
@@ -186,7 +211,7 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
         } finally {
             setLoading(false);
         }
-    }, [limit]);
+    }, [limit, showAdminControls]);
 
     const fetchSurveys = useCallback(async () => {
         try {
@@ -281,6 +306,7 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
                 image_url: form.image_url.trim(),
                 size: form.size,
                 source: form.source,
+                status: form.status,
                 survey_id: form.survey_id || null,
                 article_id: form.article_id || null,
             };
@@ -308,11 +334,28 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
             image_url: post.image_url || '',
             size: post.size || 'medium',
             source: post.source || 'manual',
+            status: post.status || 'draft',
             survey_id: post.survey_id || null,
             article_id: post.article_id || null,
         });
         setImagePreview(post.image_url || null);
         setFormError(null);
+    };
+
+    const handleTogglePublish = async (post) => {
+        try {
+            setActionLoading(true);
+            if (post.status === 'published') {
+                await api.put(`/media/${post.id}/unpublish`);
+            } else {
+                await api.put(`/media/${post.id}/publish`);
+            }
+            await fetchMediaPosts();
+        } catch (err) {
+            setFormError(err.response?.data?.error || 'Failed to update publish status');
+        } finally {
+            setActionLoading(false);
+        }
     };
 
     const handleDelete = async (id) => {
@@ -465,7 +508,7 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
                             
                             <div className="media-form-field">
                                 <label htmlFor="article_select">
-                                    <strong>Article (Optional)</strong>
+                                    <strong>Talk Article (Optional)</strong>
                                 </label>
                                 <select 
                                     id="article_select" 
@@ -502,6 +545,12 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
                                 </select>
                                 <p className="media-form-help">Select a feedback form users can submit from this media page</p>
                             </div>
+
+                            {(form.article_id || form.survey_id) && (
+                                <p className="media-form-help" style={{ marginTop: '10px', color: '#8a5a00', fontWeight: 600 }}>
+                                    Linked Talk/Feedback entities are auto-published; media card visibility can still be toggled.
+                                </p>
+                            )}
                         </div>
 
                         {/* Display Settings Section */}
@@ -530,6 +579,25 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
                                         <option value="linkedin">LinkedIn Post</option>
                                     </select>
                                     <p className="media-form-help">Where this content originated</p>
+                                </div>
+
+                                <div className="media-form-field">
+                                    <label htmlFor="status_select">
+                                        <strong>Status</strong>
+                                    </label>
+                                    <select
+                                        id="status_select"
+                                        name="status"
+                                        value={form.status}
+                                        onChange={handleFormChange}
+                                        disabled={Boolean(form.article_id || form.survey_id)}
+                                    >
+                                        <option value="draft">Draft</option>
+                                        <option value="published">Published</option>
+                                    </select>
+                                    <p className="media-form-help">
+                                        Draft media is hidden from public feed until published by admin.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -582,6 +650,7 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
                                     isAdmin={showAdminControls}
                                     onEdit={handleEdit}
                                     onDelete={handleDelete}
+                                    onTogglePublish={handleTogglePublish}
                                     actionLoading={actionLoading}
                                     clickable={clickable}
                                     onCardClick={(postId) => {

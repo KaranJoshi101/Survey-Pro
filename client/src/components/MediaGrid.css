@@ -276,6 +276,40 @@
   color: #fff;
 }
 
+.media-admin-btn-publish {
+  background: #1f7a3f;
+  color: #fff;
+}
+
+.media-admin-btn-unpublish {
+  background: #9a6700;
+  color: #fff;
+}
+
+.media-status-badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  z-index: 3;
+}
+
+.media-status-draft {
+  background: #fff3cd;
+  color: #8a5a00;
+  border: 1px solid #f2cf7c;
+}
+
+.media-status-published {
+  background: #dff7e8;
+  color: #1a6e42;
+  border: 1px solid #9fd9b6;
+}
+
 /* Main Media Grid Container */
 .media-grid {
   display: grid;

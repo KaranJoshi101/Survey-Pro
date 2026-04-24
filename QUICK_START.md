@@ -87,10 +87,13 @@ Note: unified analytics route `/admin/analytics` is currently disabled.
 - Survey responses export to Excel
 - Survey analytics and demographics views
 - Rich text article management
-- Media feed admin management
+- Media feed admin management with draft/publish controls
+- Linked content rules: media-linked surveys become Feedback and media-linked articles become Talks
+- Revert behavior: deleting last linked media converts Feedback/Talk back to draft Survey/Article
 - Training categories, playlists, and notes admin
 - Consulting service management and request workflow (`status`, `priority`, `notes`)
 - Consulting analytics with period selector (`7d`, `30d`, `all`)
+- Profile management with secure password change (current password + strong new password)
 
 ## 8. Production DB Sync (Optional)
 

@@ -9,6 +9,14 @@ const userService = {
     updateProfile: (data) =>
         api.put('/users/profile', data),
 
+    // Change current user's password
+    changePassword: (current_password, new_password, confirm_new_password) =>
+        api.put('/users/profile/password', {
+            current_password,
+            new_password,
+            confirm_new_password,
+        }),
+
     // Get all users (admin)
     getAllUsers: (page = 1, limit = 20, search = '') => {
         let url = `/users?page=${page}&limit=${limit}`;

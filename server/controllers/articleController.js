@@ -8,12 +8,35 @@ const getArticles = async (req, res, next) => {
         const offset = (page - 1) * limit;
 
         const articlesResult = await pool.query(
-            'SELECT a.id, a.title, a.content, a.author, u.name as author_name, a.created_at FROM articles a JOIN users u ON a.author = u.id WHERE a.is_published = true ORDER BY a.created_at DESC LIMIT $1 OFFSET $2',
+            `SELECT
+                a.id,
+                a.title,
+                a.content,
+                a.author,
+                u.name as author_name,
+                CASE
+                    WHEN EXISTS (SELECT 1 FROM media_posts mp WHERE mp.article_id = a.id) THEN true
+                    ELSE a.is_published
+                END AS is_published,
+                a.created_at
+             FROM articles a
+             JOIN users u ON a.author = u.id
+             WHERE (
+                a.is_published = true
+                OR EXISTS (SELECT 1 FROM media_posts mp WHERE mp.article_id = a.id)
+             )
+             ORDER BY a.created_at DESC
+             LIMIT $1 OFFSET $2`,
             [limit, offset]
         );
 
         const countResult = await pool.query(
-            'SELECT COUNT(*) FROM articles WHERE is_published = true'
+            `SELECT COUNT(*)
+             FROM articles a
+             WHERE (
+                a.is_published = true
+                OR EXISTS (SELECT 1 FROM media_posts mp WHERE mp.article_id = a.id)
+             )`
         );
 
         res.json({
@@ -35,7 +58,25 @@ const getArticleById = async (req, res, next) => {
         const { id } = req.params;
 
         const result = await pool.query(
-            'SELECT a.id, a.title, a.content, a.author, u.name as author_name, a.is_published, a.created_at, a.updated_at FROM articles a JOIN users u ON a.author = u.id WHERE a.id = $1 AND a.is_published = true',
+            `SELECT
+                a.id,
+                a.title,
+                a.content,
+                a.author,
+                u.name as author_name,
+                CASE
+                    WHEN EXISTS (SELECT 1 FROM media_posts mp WHERE mp.article_id = a.id) THEN true
+                    ELSE a.is_published
+                END AS is_published,
+                a.created_at,
+                a.updated_at
+             FROM articles a
+             JOIN users u ON a.author = u.id
+             WHERE a.id = $1
+               AND (
+                    a.is_published = true
+                    OR EXISTS (SELECT 1 FROM media_posts mp WHERE mp.article_id = a.id)
+               )`,
             [id]
         );
 
@@ -81,6 +122,19 @@ const updateArticle = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { title, content, is_published } = req.body;
+
+        if (is_published === false) {
+            const talkCheck = await pool.query(
+                'SELECT 1 FROM media_posts WHERE article_id = $1 LIMIT 1',
+                [id]
+            );
+
+            if (talkCheck.rows.length > 0) {
+                return res.status(400).json({
+                    error: 'Talk articles must remain published',
+                });
+            }
+        }
 
         const result = await pool.query(
             'UPDATE articles SET title = COALESCE($1, title), content = COALESCE($2, content), is_published = COALESCE($3, is_published), updated_at = NOW() WHERE id = $4 RETURNING *',
@@ -133,7 +187,25 @@ const getAdminArticles = async (req, res, next) => {
         const offset = (page - 1) * limit;
 
         const articlesResult = await pool.query(
-            'SELECT * FROM articles WHERE author = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
+            `SELECT
+                a.*,
+                EXISTS (
+                    SELECT 1
+                    FROM media_posts mp
+                    WHERE mp.article_id = a.id
+                ) AS is_talk,
+                CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM media_posts mp
+                        WHERE mp.article_id = a.id
+                    ) THEN true
+                    ELSE a.is_published
+                END AS effective_is_published
+             FROM articles a
+             WHERE a.author = $1
+             ORDER BY a.created_at DESC
+             LIMIT $2 OFFSET $3`,
             [req.user.userId, limit, offset]
         );
 
@@ -142,8 +214,13 @@ const getAdminArticles = async (req, res, next) => {
             [req.user.userId]
         );
 
+        const normalizedArticles = articlesResult.rows.map((article) => ({
+            ...article,
+            is_published: article.effective_is_published,
+        }));
+
         res.json({
-            articles: articlesResult.rows,
+            articles: normalizedArticles,
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),

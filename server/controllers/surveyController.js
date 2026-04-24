@@ -17,13 +17,20 @@ const getAllSurveys = async (req, res, next) => {
         const { page = 1, limit = 10, status, exclude_feedback } = req.query;
         const offset = (page - 1) * limit;
 
-        let query = `SELECT s.*, 
-                (SELECT COUNT(*)::int FROM questions q WHERE q.survey_id = s.id) AS question_count,
-                EXISTS (
+        const feedbackExistsSql = `EXISTS (
                         SELECT 1
                         FROM media_posts mp
                         WHERE mp.survey_id = s.id
-                     ) AS is_feedback
+                     )`;
+        const effectiveStatusSql = `CASE
+                        WHEN ${feedbackExistsSql} THEN 'published'::survey_status
+                        ELSE s.status
+                     END`;
+
+        let query = `SELECT s.*, 
+                (SELECT COUNT(*)::int FROM questions q WHERE q.survey_id = s.id) AS question_count,
+                ${feedbackExistsSql} AS is_feedback,
+                ${effectiveStatusSql}::text AS effective_status
                      FROM surveys s`;
         let countQuery = 'SELECT COUNT(*) FROM surveys s';
         const params = [];
@@ -31,7 +38,7 @@ const getAllSurveys = async (req, res, next) => {
 
         if (status) {
             params.push(status);
-            whereClauses.push(`s.status = $${params.length}`);
+            whereClauses.push(`${effectiveStatusSql}::text = $${params.length}`);
         }
 
         const shouldExcludeFeedback = String(exclude_feedback || '').toLowerCase() === 'true';
@@ -50,9 +57,13 @@ const getAllSurveys = async (req, res, next) => {
         const surveys = await pool.query(query, [...params, limit, offset]);
         const countResult = await pool.query(countQuery, params);
         const total = parseInt(countResult.rows[0].count, 10);
+        const normalizedSurveys = surveys.rows.map((survey) => ({
+            ...survey,
+            status: survey.effective_status || survey.status,
+        }));
 
         res.json({
-            surveys: surveys.rows,
+            surveys: normalizedSurveys,
             pagination: {
                 page: parseInt(page, 10),
                 limit: parseInt(limit, 10),
@@ -75,7 +86,15 @@ const getSurveyById = async (req, res, next) => {
                 SELECT 1
                 FROM media_posts mp
                 WHERE mp.survey_id = s.id
-             ) AS is_feedback
+             ) AS is_feedback,
+             CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM media_posts mp
+                    WHERE mp.survey_id = s.id
+                ) THEN 'published'::survey_status
+                ELSE s.status
+             END::text AS effective_status
              FROM surveys s
              WHERE s.id = $1`,
             [id]
@@ -98,6 +117,7 @@ const getSurveyById = async (req, res, next) => {
         );
 
         const survey = surveyResult.rows[0];
+        survey.status = survey.effective_status || survey.status;
         survey.questions = questionsResult.rows;
 
         return res.json({ survey });
@@ -176,6 +196,18 @@ const updateSurvey = async (req, res, next) => {
         }
 
         if (status !== undefined) {
+            if (status === 'draft') {
+                const feedbackCheck = await pool.query(
+                    'SELECT 1 FROM media_posts WHERE survey_id = $1 LIMIT 1',
+                    [id]
+                );
+
+                if (feedbackCheck.rows.length > 0) {
+                    return res.status(400).json({
+                        error: 'Feedback surveys must remain published',
+                    });
+                }
+            }
             fields.push(`status = $${idx++}`);
             values.push(status);
         }

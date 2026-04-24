@@ -66,7 +66,9 @@ const initDatabase = async () => {
             '17_add_consulting_events.sql',
             '18_add_consulting_request_workflow_fields.sql',
             '19_create_platform_events.sql',
-            '20_remove_consulting_request_assignment.sql'
+            '20_remove_consulting_request_assignment.sql',
+            '21_add_media_status.sql',
+            '22_sync_feedback_talk_publish_state.sql'
         ];
 
         for (const migration of migrations) {

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import articleService from '../services/articleService';
-import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
 
@@ -99,7 +98,6 @@ const AdminArticlesPage = () => {
     const [success, setSuccess] = useState('');
     const [deleting, setDeleting] = useState(null);
     const [publishing, setPublishing] = useState(null);
-    const [talkSummaryArticleIds, setTalkSummaryArticleIds] = useState(new Set());
 
     // Form states
     const [showForm, setShowForm] = useState(false);
@@ -109,8 +107,17 @@ const AdminArticlesPage = () => {
     const [submitting, setSubmitting] = useState(false);
     const quillRef = useRef(null);
 
-    const articleCount = articles.filter((article) => !talkSummaryArticleIds.has(Number(article.id))).length;
-    const talksCount = articles.filter((article) => talkSummaryArticleIds.has(Number(article.id))).length;
+    const getEffectiveIsPublished = (article) => {
+        if (article?.is_talk) {
+            return true;
+        }
+        return Boolean(article?.is_published);
+    };
+
+    const articleCount = articles.filter((article) => !article.is_talk).length;
+    const talksCount = articles.filter((article) => article.is_talk).length;
+    const publishedCount = articles.filter((article) => getEffectiveIsPublished(article)).length;
+    const draftCount = articles.length - publishedCount;
 
     const handleImageInsert = useCallback(() => {
         const input = document.createElement('input');
@@ -159,19 +166,7 @@ const AdminArticlesPage = () => {
     const fetchArticles = useCallback(async () => {
         try {
             setLoading(true);
-            const [articlesResponse, mediaResponse] = await Promise.all([
-                articleService.getAdminArticles(1, 100),
-                api.get('/media', { params: { limit: 500 } }),
-            ]);
-
-            const mediaPosts = Array.isArray(mediaResponse.data?.posts) ? mediaResponse.data.posts : [];
-            const attachedArticleIds = new Set(
-                mediaPosts
-                    .map((post) => Number(post.article_id))
-                    .filter((id) => Number.isInteger(id) && id > 0)
-            );
-
-            setTalkSummaryArticleIds(attachedArticleIds);
+            const articlesResponse = await articleService.getAdminArticles(1, 100);
             setArticles(articlesResponse.data.articles);
             setError('');
         } catch (err) {
@@ -280,6 +275,11 @@ const AdminArticlesPage = () => {
     const handleUnpublish = async (articleId) => {
         try {
             setPublishing(articleId);
+            const targetArticle = articles.find((a) => a.id === articleId);
+            if (targetArticle?.is_talk) {
+                setError('Talk articles must remain published');
+                return;
+            }
             await articleService.unpublishArticle(articleId);
             setArticles(
                 articles.map((a) =>
@@ -322,6 +322,8 @@ const AdminArticlesPage = () => {
 
             <div className="admin-chip-row" style={{ marginBottom: '12px' }}>
                 <span className="admin-chip total">Total: {articles.length}</span>
+                <span className="admin-chip published">Published: {publishedCount}</span>
+                <span className="admin-chip draft">Draft: {draftCount}</span>
                 <span
                     className="admin-chip"
                     style={{ backgroundColor: '#e8f0ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}
@@ -415,7 +417,8 @@ const AdminArticlesPage = () => {
                 ) : (
                     <div style={{ maxWidth: '800px' }}>
                         {articles.map((article) => {
-                            const isTalk = talkSummaryArticleIds.has(Number(article.id));
+                            const isTalk = Boolean(article.is_talk);
+                            const effectiveIsPublished = getEffectiveIsPublished(article);
                             return (
                             <div
                                 key={article.id}
@@ -433,15 +436,15 @@ const AdminArticlesPage = () => {
                                         </div>
                                         <span
                                             style={{
-                                                backgroundColor: article.is_published ? '#e8f8f0' : '#fff8e1',
-                                                color: article.is_published ? '#1a6e42' : '#8a6d00',
+                                                backgroundColor: effectiveIsPublished ? '#e8f8f0' : '#fff8e1',
+                                                color: effectiveIsPublished ? '#1a6e42' : '#8a6d00',
                                                 padding: '4px 8px',
                                                 borderRadius: '4px',
                                                 fontSize: '0.85rem',
                                                 fontWeight: 'bold',
                                             }}
                                         >
-                                            {article.is_published ? 'Published' : 'Draft'}
+                                            {effectiveIsPublished ? 'Published' : 'Draft'}
                                         </span>
                                         <span
                                             style={{
@@ -471,7 +474,7 @@ const AdminArticlesPage = () => {
                                             Edit
                                         </button>
 
-                                        {!article.is_published ? (
+                                        {!effectiveIsPublished ? (
                                             <button
                                                 onClick={() => handlePublish(article.id)}
                                                 className="btn btn-success"
@@ -484,7 +487,8 @@ const AdminArticlesPage = () => {
                                             <button
                                                 onClick={() => handleUnpublish(article.id)}
                                                 className="btn btn-warning"
-                                                disabled={publishing === article.id}
+                                                disabled={publishing === article.id || isTalk}
+                                                title={isTalk ? 'Talk articles must remain published' : ''}
                                                 style={{ padding: '6px 12px', fontSize: '0.85rem' }}
                                             >
                                                 {publishing === article.id ? 'Unpublishing...' : 'Unpublish'}

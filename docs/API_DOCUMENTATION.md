@@ -93,6 +93,32 @@ Authorization: Bearer <token>
 
 ---
 
+### Change Password (Authenticated User)
+**PUT** `/users/profile/password`
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Request Body:**
+```json
+{
+  "current_password": "OldPassword123!",
+  "new_password": "NewPassword123!",
+  "confirm_new_password": "NewPassword123!"
+}
+```
+
+**Notes:**
+- `current_password` must match the existing password.
+- `new_password` must differ from current password.
+- In production, strong password policy is enforced (length + upper/lower/number/special).
+
+---
+
+---
+
 ## 2. Survey Endpoints
 
 ### Get All Surveys
@@ -395,6 +421,9 @@ Authorization: Bearer <admin_token>
 ### Get Published Articles
 **GET** `/articles?page=1&limit=10`
 
+**Notes:**
+- Articles linked to media as Talks are treated as published in API responses.
+
 **Response:**
 ```json
 {
@@ -474,6 +503,9 @@ Authorization: Bearer <admin_token>
 }
 ```
 
+**Notes:**
+- If an article is linked from media (`talk`), setting `is_published=false` is rejected.
+
 ---
 
 ### Delete Article (Admin Only)
@@ -494,9 +526,79 @@ Authorization: Bearer <admin_token>
 Authorization: Bearer <admin_token>
 ```
 
+**Notes:**
+- Admin article responses include effective publish state (`is_published`) and `is_talk`.
+
 ---
 
-## 5. Consulting Endpoints
+## 5. Media Endpoints
+
+### Get Public Media Feed
+**GET** `/media?limit=50`
+
+**Notes:**
+- Returns only media posts with `status = published`.
+
+### Get Admin Media Feed (Admin Only)
+**GET** `/media/admin/all?limit=100`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Notes:**
+- Returns both `draft` and `published` media posts for administration.
+
+### Create Media Post (Admin Only)
+**POST** `/media`
+
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+
+**Request Body (sample):**
+```json
+{
+  "title": "Media title",
+  "description": "Optional summary",
+  "image_url": "https://example.com/image.jpg",
+  "size": "medium",
+  "source": "manual",
+  "status": "draft",
+  "survey_id": 12,
+  "article_id": null
+}
+```
+
+**Notes:**
+- Standalone media defaults to `draft`.
+- If `survey_id` or `article_id` is linked, media is auto-published.
+- Linked survey/article are auto-published as Feedback/Talk content.
+
+### Publish Media Post (Admin Only)
+**PUT** `/media/:id/publish`
+
+### Unpublish Media Post (Admin Only)
+**PUT** `/media/:id/unpublish`
+
+**Notes:**
+- Media card visibility can be toggled independently.
+- Linked Feedback/Talk entities remain published even if media is unpublished.
+
+### Delete Media Post (Admin Only)
+**DELETE** `/media/:id`
+
+**Notes:**
+- If deleted media was the last link to a survey/article:
+  - linked Feedback survey is reverted to `draft`
+  - linked Talk article is reverted to `is_published=false`
+- If other media posts still link the same entity, it remains in Feedback/Talk published state.
+
+---
+
+## 6. Consulting Endpoints
 
 ### Public: Get Active Consulting Services
 **GET** `/consulting`

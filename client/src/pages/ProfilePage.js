@@ -10,6 +10,12 @@ const ProfilePage = () => {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [passwordSaving, setPasswordSaving] = useState(false);
+    const [passwordForm, setPasswordForm] = useState({
+        current_password: '',
+        new_password: '',
+        confirm_new_password: '',
+    });
 
     const [profile, setProfile] = useState({
         name: '',
@@ -86,6 +92,49 @@ const ProfilePage = () => {
             setError(errorMsg);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handlePasswordChange = (e) => {
+        const { name, value } = e.target;
+        setPasswordForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handlePasswordSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!passwordForm.current_password || !passwordForm.new_password || !passwordForm.confirm_new_password) {
+            setError('All password fields are required');
+            return;
+        }
+
+        if (passwordForm.new_password !== passwordForm.confirm_new_password) {
+            setError('New password and confirm password must match');
+            return;
+        }
+
+        setPasswordSaving(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            await userService.changePassword(
+                passwordForm.current_password,
+                passwordForm.new_password,
+                passwordForm.confirm_new_password
+            );
+
+            setPasswordForm({
+                current_password: '',
+                new_password: '',
+                confirm_new_password: '',
+            });
+            setSuccess('Password changed successfully!');
+            setTimeout(() => setSuccess(''), 3000);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to change password');
+        } finally {
+            setPasswordSaving(false);
         }
     };
 
@@ -250,6 +299,67 @@ const ProfilePage = () => {
                                 style={{ width: '100%', padding: '12px' }}
                             >
                                 {saving ? 'Saving...' : 'Save Profile'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div className="card" style={{ marginTop: '24px' }}>
+                    <div className="card-body">
+                        <h2 style={{ marginTop: 0, color: '#003594' }}>Change Password</h2>
+                        <p style={{ color: '#666', marginTop: 0 }}>
+                            Enter your current password, then set a new password.
+                        </p>
+
+                        <form onSubmit={handlePasswordSubmit}>
+                            <div className="form-group">
+                                <label>Current Password *</label>
+                                <input
+                                    type="password"
+                                    name="current_password"
+                                    value={passwordForm.current_password}
+                                    onChange={handlePasswordChange}
+                                    autoComplete="current-password"
+                                    required
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+
+                            <div className="responsive-two-col-grid" style={{ gap: '16px' }}>
+                                <div className="form-group">
+                                    <label>New Password *</label>
+                                    <input
+                                        type="password"
+                                        name="new_password"
+                                        value={passwordForm.new_password}
+                                        onChange={handlePasswordChange}
+                                        autoComplete="new-password"
+                                        required
+                                        style={{ width: '100%' }}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Confirm New Password *</label>
+                                    <input
+                                        type="password"
+                                        name="confirm_new_password"
+                                        value={passwordForm.confirm_new_password}
+                                        onChange={handlePasswordChange}
+                                        autoComplete="new-password"
+                                        required
+                                        style={{ width: '100%' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                disabled={passwordSaving}
+                                style={{ width: '100%', padding: '12px' }}
+                            >
+                                {passwordSaving ? 'Updating Password...' : 'Update Password'}
                             </button>
                         </form>
                     </div>

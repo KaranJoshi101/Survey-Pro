@@ -9,6 +9,9 @@ Survey platform built with PostgreSQL, Express, React, and Node.js.
 - Survey analytics (question-level + demographics)
 - Article publishing and management (rich text)
 - Media feed administration
+- Media draft/publish lifecycle with admin publish/unpublish controls
+- Linked media behavior: surveys become Feedback and articles become Talks while linked
+- Profile management with secure password change flow
 - Training category, playlist, and notes administration
 - Consulting services and authenticated consultation request workflow
 - Consulting analytics with period selector (`7d`, `30d`, `all`)
@@ -118,6 +121,25 @@ CREATE DATABASE survey_app;
 \i database/migrations/01_initial_schema.sql
 \i database/migrations/02_add_is_banned.sql
 \i database/migrations/03_add_profile_fields.sql
+\i database/migrations/04_add_question_type_filters.sql
+\i database/migrations/05_add_media_posts.sql
+\i database/migrations/06_add_media_details_survey.sql
+\i database/migrations/07_refactor_media_to_use_article_id.sql
+\i database/migrations/08_create_training_videos.sql
+\i database/migrations/09_create_training_playlists.sql
+\i database/migrations/10_add_youtube_playlist_url.sql
+\i database/migrations/11_add_survey_submission_email_fields.sql
+\i database/migrations/12_add_signup_otp_verifications.sql
+\i database/migrations/13_add_training_categories_and_notes.sql
+\i database/migrations/14_drop_unused_fields.sql
+\i database/migrations/15_add_consulting_services.sql
+\i database/migrations/16_add_consulting_hero_fields.sql
+\i database/migrations/17_add_consulting_events.sql
+\i database/migrations/18_add_consulting_request_workflow_fields.sql
+\i database/migrations/19_create_platform_events.sql
+\i database/migrations/20_remove_consulting_request_assignment.sql
+\i database/migrations/21_add_media_status.sql
+\i database/migrations/22_sync_feedback_talk_publish_state.sql
 \i database/seeds/seed_data.sql
 ```
 

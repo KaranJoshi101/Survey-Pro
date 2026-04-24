@@ -159,16 +159,10 @@ const Navbar = () => {
 
             <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
                 <Link
-                    to="/surveys"
+                    to="/dashboard"
                     style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}
                 >
-                    Surveys
-                </Link>
-                <Link
-                    to="/articles"
-                    style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}
-                >
-                    Articles
+                    Home
                 </Link>
                 <Link
                     to="/training"

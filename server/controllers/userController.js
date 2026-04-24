@@ -1,5 +1,6 @@
 // User Controller (Admin user management and dashboard stats)
 const pool = require('../config/database');
+const { comparePassword, hashPassword } = require('../utils/auth');
 
 // Get all users (admin) with optional search
 const getAllUsers = async (req, res, next) => {
@@ -208,20 +209,41 @@ const getDashboardStats = async (req, res, next) => {
         `);
 
         // Survey status distribution (for doughnut chart)
-        const surveyStatusDist = await pool.query(`
-            SELECT status::text, COUNT(*)::int AS count
-            FROM surveys
-            GROUP BY status
-        `);
+        const surveyStatusDist = await runOptionalQuery(`
+            SELECT effective_status AS status, COUNT(*)::int AS count
+            FROM (
+                SELECT
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM media_posts mp
+                            WHERE mp.survey_id = s.id
+                        ) THEN 'published'
+                        ELSE COALESCE(s.status::text, 'draft')
+                    END AS effective_status
+                FROM surveys s
+            ) q
+            GROUP BY effective_status
+        `, [], []);
 
         // Article publish status distribution (for doughnut chart)
-        const articleStatusDist = await pool.query(`
-            SELECT
-                CASE WHEN is_published THEN 'published' ELSE 'draft' END AS status,
-                COUNT(*)::int AS count
-            FROM articles
-            GROUP BY is_published
-        `);
+        const articleStatusDist = await runOptionalQuery(`
+            SELECT status, COUNT(*)::int AS count
+            FROM (
+                SELECT
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM media_posts mp
+                            WHERE mp.article_id = a.id
+                        ) THEN 'published'
+                        WHEN a.is_published THEN 'published'
+                        ELSE 'draft'
+                    END AS status
+                FROM articles a
+            ) q
+            GROUP BY status
+        `, [], []);
 
         // Survey category distribution (survey vs feedback)
         const surveyCategoryDist = await runOptionalQuery(`
@@ -254,7 +276,14 @@ const getDashboardStats = async (req, res, next) => {
                         ) THEN 'feedback'
                         ELSE 'survey'
                     END AS category,
-                    COALESCE(s.status::text, 'draft') AS status
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM media_posts mp
+                            WHERE mp.survey_id = s.id
+                        ) THEN 'published'
+                        ELSE COALESCE(s.status::text, 'draft')
+                    END AS status
                 FROM surveys s
             ) q
             GROUP BY category, status
@@ -291,7 +320,15 @@ const getDashboardStats = async (req, res, next) => {
                         ) THEN 'talks_summary'
                         ELSE 'article'
                     END AS category,
-                    CASE WHEN a.is_published THEN 'published' ELSE 'draft' END AS status
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM media_posts mp
+                            WHERE mp.article_id = a.id
+                        ) THEN 'published'
+                        WHEN a.is_published THEN 'published'
+                        ELSE 'draft'
+                    END AS status
                 FROM articles a
             ) q
             GROUP BY category, status
@@ -427,6 +464,58 @@ const updateProfile = async (req, res, next) => {
     }
 };
 
+// Change current user's password
+const changePassword = async (req, res, next) => {
+    try {
+        const { current_password, new_password } = req.body;
+
+        if (!current_password || !new_password) {
+            return res.status(400).json({
+                error: 'current_password and new_password are required',
+            });
+        }
+
+        const userResult = await pool.query(
+            'SELECT id, password_hash FROM users WHERE id = $1',
+            [req.user.userId]
+        );
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const user = userResult.rows[0];
+        const currentPasswordMatch = await comparePassword(current_password, user.password_hash);
+        if (!currentPasswordMatch) {
+            return res.status(400).json({
+                error: 'Current password is incorrect',
+            });
+        }
+
+        const isSamePassword = await comparePassword(new_password, user.password_hash);
+        if (isSamePassword) {
+            return res.status(400).json({
+                error: 'New password must be different from current password',
+            });
+        }
+
+        const newHash = await hashPassword(new_password);
+        await pool.query(
+            `UPDATE users
+             SET password_hash = $1,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = $2`,
+            [newHash, req.user.userId]
+        );
+
+        return res.json({
+            message: 'Password changed successfully',
+        });
+    } catch (err) {
+        return next(err);
+    }
+};
+
 module.exports = {
     getAllUsers,
     getUserById,
@@ -436,4 +525,5 @@ module.exports = {
     getDashboardStats,
     getProfile,
     updateProfile,
+    changePassword,
 };

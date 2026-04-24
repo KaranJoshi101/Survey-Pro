@@ -29,7 +29,9 @@ npm run init
 This will:
 - Create the `media_posts` table
 - Create ENUM types: `media_size`, `media_source`
+- Create ENUM type: `media_status`
 - Create necessary indexes
+- Add media status lifecycle columns and indexes
 - Seed sample data (from `seed_media_posts.sql`)
 
 ### 3. Verify API Endpoints
@@ -39,6 +41,9 @@ Test the API:
 ```bash
 # Get all media posts
 curl http://localhost:5000/api/media
+
+# Get all media posts including drafts (admin)
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:5000/api/media/admin/all
 
 # Get with limit parameter
 curl http://localhost:5000/api/media?limit=20
@@ -58,6 +63,7 @@ Expected response:
       "image_url": "https://...",
       "size": "medium",
       "source": "manual",
+         "status": "published",
       "created_at": "2026-03-25T..."
     }
   ],
@@ -107,9 +113,27 @@ curl -X POST http://localhost:5000/api/media \
     "description": "Description of the post",
     "image_url": "https://example.com/image.jpg",
     "size": "medium",
-    "source": "manual"
+      "source": "manual",
+      "status": "draft"
   }'
 ```
+
+Publish/unpublish controls:
+
+```bash
+# Publish media
+curl -X PUT http://localhost:5000/api/media/1/publish \
+   -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# Unpublish media
+curl -X PUT http://localhost:5000/api/media/1/unpublish \
+   -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Linked content lifecycle notes:
+- Linking `survey_id` converts survey to Feedback and enforces published state while linked.
+- Linking `article_id` converts article to Talk and enforces published state while linked.
+- Deleting the last linked media post reverts linked survey/article back to draft state.
 
 **Post Sizing:**
 - `small`: 1x1 grid cell (200x200px on desktop)
@@ -222,6 +246,7 @@ SELECT * FROM pg_indexes WHERE tablename = 'media_posts';
 -- Verify enums
 SELECT unnest(enum_range(NULL::media_size));
 SELECT unnest(enum_range(NULL::media_source));
+SELECT unnest(enum_range(NULL::media_status));
 ```
 
 ## Performance Tips
@@ -268,6 +293,10 @@ SELECT unnest(enum_range(NULL::media_source));
 Verify all files are in place:
 
 - [x] `database/migrations/05_add_media_posts.sql`
+- [x] `database/migrations/06_add_media_details_survey.sql`
+- [x] `database/migrations/07_refactor_media_to_use_article_id.sql`
+- [x] `database/migrations/21_add_media_status.sql`
+- [x] `database/migrations/22_sync_feedback_talk_publish_state.sql`
 - [x] `database/seeds/seed_media_posts.sql`
 - [x] `database/init.js` (updated with new migration)
 - [x] `server/controllers/mediaController.js`
