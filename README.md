@@ -1,6 +1,6 @@
-# Survey App (PERN Stack)
+# Survey App (MySQL Stack)
 
-Survey platform built with PostgreSQL, Express, React, and Node.js.
+Survey platform built with MySQL, Express, React, and Node.js.
 
 ## Features
 
@@ -19,7 +19,7 @@ Survey platform built with PostgreSQL, Express, React, and Node.js.
 
 ## Tech Stack
 
-- Backend: Node.js, Express, PostgreSQL
+- Backend: Node.js, Express, MySQL
 - Frontend: React (CRA + CRACO)
 - Auth: JWT + bcrypt
 
@@ -69,7 +69,7 @@ Deployment checklist and production setup are documented in:
 
 - Node.js 18+
 - npm 9+
-- PostgreSQL 12+
+- MySQL 8+
 
 ## Environment Setup
 
@@ -77,9 +77,9 @@ Create a `.env` file in the project root (`survey-app/.env`) with values like:
 
 ```env
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=3306
 DB_NAME=survey_app
-DB_USER=postgres
+DB_USER=root
 DB_PASSWORD=your_password
 
 SERVER_PORT=5000
@@ -115,32 +115,11 @@ npm run db:init
 Option 2: Manual SQL setup
 
 ```bash
-psql -U postgres
+mysql -u root -p
 CREATE DATABASE survey_app;
-\c survey_app
-\i database/migrations/01_initial_schema.sql
-\i database/migrations/02_add_is_banned.sql
-\i database/migrations/03_add_profile_fields.sql
-\i database/migrations/04_add_question_type_filters.sql
-\i database/migrations/05_add_media_posts.sql
-\i database/migrations/06_add_media_details_survey.sql
-\i database/migrations/07_refactor_media_to_use_article_id.sql
-\i database/migrations/08_create_training_videos.sql
-\i database/migrations/09_create_training_playlists.sql
-\i database/migrations/10_add_youtube_playlist_url.sql
-\i database/migrations/11_add_survey_submission_email_fields.sql
-\i database/migrations/12_add_signup_otp_verifications.sql
-\i database/migrations/13_add_training_categories_and_notes.sql
-\i database/migrations/14_drop_unused_fields.sql
-\i database/migrations/15_add_consulting_services.sql
-\i database/migrations/16_add_consulting_hero_fields.sql
-\i database/migrations/17_add_consulting_events.sql
-\i database/migrations/18_add_consulting_request_workflow_fields.sql
-\i database/migrations/19_create_platform_events.sql
-\i database/migrations/20_remove_consulting_request_assignment.sql
-\i database/migrations/21_add_media_status.sql
-\i database/migrations/22_sync_feedback_talk_publish_state.sql
-\i database/seeds/seed_data.sql
+USE survey_app;
+SOURCE database/mysql/schema.sql;
+SOURCE database/seeds/seed_data.sql;
 ```
 
 ## Run The Project
@@ -196,6 +175,12 @@ App URLs:
 
 Note: unified analytics route `/admin/analytics` is currently disabled in the app router.
 
+## Verified Migration Notes
+
+- Runtime validation completed against MySQL 8 with the pg-compatible adapter in `server/config/database.js`.
+- Bootstrap normalizes legacy seed SQL at init time, so the checked-in seed files can remain as compatibility sources.
+- The admin/protected regression matrix was revalidated on a fresh API instance after a stale port-5000 process was detected.
+
 ## Push To GitHub
 
 From `survey-app/`:
@@ -214,7 +199,3 @@ If `origin` already exists, update it:
 git remote set-url origin https://github.com/<your-username>/<your-repo>.git
 git push -u origin main
 ```
-
-## License
-
-MIT
