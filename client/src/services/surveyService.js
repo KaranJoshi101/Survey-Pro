@@ -9,9 +9,9 @@ const surveyService = {
         return api.get(url);
     },
 
-    // Get survey by ID
-    getSurveyById: (id) =>
-        api.get(`/surveys/${id}`),
+    // Get survey by slug (or legacy ID)
+    getSurveyById: (identifier) =>
+        api.get(`/surveys/${identifier}`),
 
     // Create survey (admin)
     createSurvey: (titleOrPayload, description) => {
@@ -30,13 +30,18 @@ const surveyService = {
         api.delete(`/surveys/${id}`),
 
     // Add question to survey (admin)
-    addQuestion: (surveyId, question_text, question_type, is_required = true, order_index = 1) =>
-        api.post(`/surveys/${surveyId}/questions`, {
-            question_text,
+    addQuestion: (surveyId, questionOrText, question_type, is_required = true, order_index = 1) => {
+        if (typeof questionOrText === 'object' && questionOrText !== null) {
+            return api.post(`/surveys/${surveyId}/questions`, questionOrText);
+        }
+
+        return api.post(`/surveys/${surveyId}/questions`, {
+            question_text: questionOrText,
             question_type,
             is_required,
             order_index,
-        }),
+        });
+    },
 
     // Add option to question (admin)
     addOption: (questionId, option_text, order_index = 1) =>
@@ -81,6 +86,30 @@ const surveyService = {
     // Unpublish survey (admin)
     unpublishSurvey: (id) =>
         api.put(`/surveys/${id}`, { status: 'draft' }),
+
+    // Autosave survey draft (admin)
+    autosaveSurvey: (surveyId, data) =>
+        api.put(`/surveys/${surveyId}/autosave`, data),
+
+    // Get survey drafts (admin)
+    getSurveyDrafts: (surveyId) =>
+        api.get(`/surveys/${surveyId}/drafts`),
+
+    // Save survey as draft (admin)
+    saveDraft: (surveyId, data) =>
+        api.post(`/surveys/${surveyId}/drafts`, data),
+
+    // Update survey settings (admin)
+    updateSurveySettings: (id, settings) =>
+        api.put(`/surveys/${id}/settings`, settings),
+
+    // Get survey responses with deduplication (admin)
+    getSurveyResponses: (surveyId, page = 1, limit = 20) =>
+        api.get(`/surveys/${surveyId}/responses?page=${page}&limit=${limit}`),
+
+    // Check if user already submitted (public)
+    checkUserSubmission: (surveyId) =>
+        api.get(`/surveys/${surveyId}/user-submission`),
 };
 
 export default surveyService;

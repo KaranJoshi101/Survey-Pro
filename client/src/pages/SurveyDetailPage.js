@@ -5,9 +5,10 @@ import responseService from '../services/responseService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
 import BackLink from '../components/BackLink';
+import SeoMeta from '../components/SeoMeta';
 
 const SurveyDetailPage = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -41,20 +42,23 @@ const SurveyDetailPage = () => {
         try {
             setLoading(true);
             const [surveyResponse, userResponsesResponse] = await Promise.all([
-                surveyService.getSurveyById(id),
+                surveyService.getSurveyById(slug),
                 isAuthenticated ? responseService.getUserResponses(1, 200) : Promise.resolve({ data: { responses: [] } }),
             ]);
+
+            const currentSurvey = surveyResponse.data.survey;
+            const currentSurveyId = Number(currentSurvey?.id);
 
             const submittedSurveyIds = new Set(
                 (userResponsesResponse.data.responses || []).map((response) => Number(response.survey_id))
             );
 
             const currentSubmission = (userResponsesResponse.data.responses || []).find(
-                (response) => Number(response.survey_id) === parseInt(id, 10)
+                (response) => Number(response.survey_id) === currentSurveyId
             );
 
-            setSurvey(surveyResponse.data.survey);
-            setAlreadySubmitted(submittedSurveyIds.has(parseInt(id, 10)));
+            setSurvey(currentSurvey);
+            setAlreadySubmitted(submittedSurveyIds.has(currentSurveyId));
             setSubmittedAt(currentSubmission?.submitted_at || null);
             setError('');
         } catch (err) {
@@ -63,7 +67,7 @@ const SurveyDetailPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [id, isAuthenticated]);
+    }, [slug, isAuthenticated]);
 
     useEffect(() => {
         fetchSurvey();
@@ -88,6 +92,12 @@ const SurveyDetailPage = () => {
 
     return (
         <div className="container mt-4">
+            <SeoMeta
+                title={`${survey.title} | Survey Pro`}
+                description={survey.description || 'Take this survey on Survey Pro and share your responses.'}
+                keywords={['survey', 'feedback', survey.title]}
+                path={`/surveys/${survey.slug || slug}`}
+            />
             <BackLink to={backTo} label={backLabel} />
 
             <div className="card mt-3">
@@ -154,7 +164,7 @@ const SurveyDetailPage = () => {
                                 </button>
                             ) : (
                                 <button
-                                    onClick={() => navigate(`/survey/${id}/take`, { state: { fromMedia: backTo } })}
+                                    onClick={() => navigate(`/survey/${survey.id}/take`, { state: { fromMedia: backTo } })}
                                     className="btn btn-success"
                                     style={{ fontSize: '1.1rem', padding: '12px 24px' }}
                                 >
@@ -167,7 +177,7 @@ const SurveyDetailPage = () => {
                                     Please{' '}
                                     <Link
                                         to="/login"
-                                        state={{ from: `/survey/${id}/take`, fromMedia: backTo }}
+                                        state={{ from: `/survey/${survey.id}/take`, fromMedia: backTo }}
                                         style={{ color: '#003594', fontWeight: 'bold' }}
                                     >
                                         login
@@ -177,6 +187,9 @@ const SurveyDetailPage = () => {
                             </div>
                         )}
                     </div>
+                    <p style={{ marginTop: '12px' }}>
+                        Need context first? <Link to="/articles">Read related articles</Link>.
+                    </p>
                 </div>
             </div>
         </div>

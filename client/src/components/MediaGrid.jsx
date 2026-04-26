@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import './MediaGrid.css';
 
 /**
@@ -153,6 +154,7 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
     const { isAdmin } = useAuth();
     const showAdminControls = isAdmin && adminMode;
     const navigate = useNavigate();
+    const { addToast } = useToast();
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -206,12 +208,14 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
             }
         } catch (err) {
             console.error('[MediaGrid] Error fetching posts:', err.message);
-            setError(err.message || 'Failed to load media posts');
+            const message = err.response?.data?.error || err.message || 'Failed to load media posts';
+            addToast(message, 'error');
+            setError(message);
             setPosts([]);
         } finally {
             setLoading(false);
         }
-    }, [limit, showAdminControls]);
+    }, [limit, showAdminControls, addToast]);
 
     const fetchSurveys = useCallback(async () => {
         try {
@@ -294,7 +298,9 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
         setFormError(null);
 
         if (!form.title.trim() || !form.image_url.trim()) {
-            setFormError('Title and image are required.');
+            const validationMessage = 'Title and image are required.';
+            setFormError(validationMessage);
+            addToast(validationMessage, 'warning');
             return;
         }
 
@@ -319,8 +325,11 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
 
             resetForm();
             await fetchMediaPosts();
+            addToast(`Media post ${editingId ? 'updated' : 'created'} successfully`, 'success');
         } catch (err) {
-            setFormError(err.response?.data?.error || 'Failed to save media post');
+            const message = err.response?.data?.error || 'Failed to save media post';
+            setFormError(message);
+            addToast(message, 'error');
         } finally {
             setActionLoading(false);
         }
@@ -351,8 +360,11 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
                 await api.put(`/media/${post.id}/publish`);
             }
             await fetchMediaPosts();
+            addToast('Media post status updated', 'success');
         } catch (err) {
-            setFormError(err.response?.data?.error || 'Failed to update publish status');
+            const message = err.response?.data?.error || 'Failed to update publish status';
+            setFormError(message);
+            addToast(message, 'error');
         } finally {
             setActionLoading(false);
         }
@@ -367,11 +379,14 @@ const MediaGrid = ({ title = 'Media Feed', limit = 50, clickable = false, adminM
             setActionLoading(true);
             await api.delete(`/media/${id}`);
             await fetchMediaPosts();
+            addToast('Media post deleted successfully', 'success');
             if (editingId === id) {
                 resetForm();
             }
         } catch (err) {
-            setFormError(err.response?.data?.error || 'Failed to delete media post');
+            const message = err.response?.data?.error || 'Failed to delete media post';
+            setFormError(message);
+            addToast(message, 'error');
         } finally {
             setActionLoading(false);
         }

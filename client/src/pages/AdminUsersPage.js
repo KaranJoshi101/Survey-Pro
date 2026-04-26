@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import userService from '../services/userService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
+import Button from '../components/ui/Button';
+import Card, { CardBody, CardHeader } from '../components/ui/Card';
+import Input from '../components/ui/Input';
 
 const AdminUsersPage = () => {
     const [users, setUsers] = useState([]);
@@ -103,103 +106,119 @@ const AdminUsersPage = () => {
     }
 
     return (
-        <div className="container mt-4">
+        <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
             <BackLink to="/admin" label="Back to Admin" />
-            <h1 className="admin-title">Users Management</h1>
+            <Card>
+                <CardHeader>
+                    <h1 className="text-2xl font-semibold text-slate-900">Users Management</h1>
+                    <p className="mt-1 text-sm text-slate-500">View users, update account status, and manage access.</p>
+                </CardHeader>
+            </Card>
 
-            {error && <div className="alert alert-danger">{error}</div>}
-            {success && <div className="alert alert-success">{success}</div>}
+            {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+            {success && <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</div>}
 
-            {/* Search */}
-            <div className="card" style={{ marginBottom: '24px' }}>
-                <div className="card-body">
-                    <input
+            <Card>
+                <CardBody>
+                    <Input
                         type="text"
                         placeholder="Search by name or email..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <p className="admin-search-meta">
+                    <p className="mt-2 text-xs text-slate-500">
                         Showing {users.length} of {pagination.total} users
                     </p>
-                </div>
-            </div>
+                </CardBody>
+            </Card>
 
-            {/* Users Table */}
             {users.length === 0 ? (
-                <div className="card admin-empty-card">
-                    <p className="admin-empty-text">No users found</p>
-                </div>
+                <Card>
+                    <CardBody>
+                        <p className="text-sm text-slate-600">No users found</p>
+                    </CardBody>
+                </Card>
             ) : (
-                <div className="card admin-table-card">
-                    <table className="admin-table">
+                <Card>
+                    <div className="overflow-x-auto">
+                    <table className="min-w-full border-collapse text-sm">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Status</th>
-                                <th>Joined</th>
-                                <th>Actions</th>
+                            <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                                <th className="px-4 py-3">ID</th>
+                                <th className="px-4 py-3">Name</th>
+                                <th className="px-4 py-3">Email</th>
+                                <th className="px-4 py-3">Role</th>
+                                <th className="px-4 py-3">Status</th>
+                                <th className="px-4 py-3">Joined</th>
+                                <th className="px-4 py-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {users.map((user) => (
-                                <tr key={user.id}>
-                                    <td className="admin-cell">{user.id}</td>
-                                    <td className="admin-cell">
+                                <tr key={user.id} className="border-b border-slate-100 transition-all duration-200 hover:bg-slate-50">
+                                    <td className="px-4 py-3 text-slate-600">{user.id}</td>
+                                    <td className="px-4 py-3 text-slate-800">
                                         <strong>{user.name}</strong>
                                     </td>
-                                    <td className="admin-cell">{user.email}</td>
-                                    <td className="admin-cell">
-                                        <span className={`badge ${user.role === 'admin' ? 'badge-admin' : 'badge-user'}`}>
+                                    <td className="px-4 py-3 text-slate-700">{user.email}</td>
+                                    <td className="px-4 py-3">
+                                        <span className={[
+                                            'rounded-md border px-2 py-1 text-xs font-medium',
+                                            user.role === 'admin'
+                                                ? 'border-indigo-200 bg-indigo-50 text-indigo-700'
+                                                : 'border-slate-200 bg-slate-50 text-slate-700',
+                                        ].join(' ')}>
                                             {user.role}
                                         </span>
                                     </td>
-                                    <td className="admin-cell">
-                                        <span className={`badge ${user.is_banned ? 'badge-banned' : 'badge-active'}`}>
+                                    <td className="px-4 py-3">
+                                        <span className={[
+                                            'rounded-md border px-2 py-1 text-xs font-medium',
+                                            user.is_banned
+                                                ? 'border-red-200 bg-red-50 text-red-700'
+                                                : 'border-emerald-200 bg-emerald-50 text-emerald-700',
+                                        ].join(' ')}>
                                             {user.is_banned ? 'Banned' : 'Active'}
                                         </span>
                                     </td>
-                                    <td className="admin-cell-muted">
+                                    <td className="px-4 py-3 text-slate-500">
                                         {new Date(user.created_at).toLocaleDateString()}
                                     </td>
-                                    <td className="admin-cell">
-                                        <div className="admin-actions-wrap">
-                                            <button
-                                                onClick={() => setSelectedUser(user)}
-                                                className="btn btn-primary btn-compact"
-                                            >
+                                    <td className="px-4 py-3">
+                                        <div className="flex flex-wrap gap-2">
+                                            <Button onClick={() => setSelectedUser(user)} variant="outline" size="sm">
                                                 View
-                                            </button>
+                                            </Button>
                                             {user.role !== 'admin' && (
                                                 user.is_banned ? (
-                                                    <button
+                                                    <Button
                                                         onClick={() => handleUnban(user.id)}
-                                                        className="btn btn-success btn-compact"
+                                                        variant="solid"
+                                                        size="sm"
                                                         disabled={banning === user.id}
                                                     >
                                                         {banning === user.id ? 'Unbanning...' : 'Unban'}
-                                                    </button>
+                                                    </Button>
                                                 ) : (
-                                                    <button
+                                                    <Button
                                                         onClick={() => handleBan(user.id)}
-                                                        className="btn btn-danger btn-compact"
+                                                        variant="danger"
+                                                        size="sm"
                                                         disabled={banning === user.id}
                                                     >
                                                         {banning === user.id ? 'Banning...' : 'Ban'}
-                                                    </button>
+                                                    </Button>
                                                 )
                                             )}
                                             {user.role !== 'admin' && user.is_banned && (
-                                                <button
+                                                <Button
                                                     onClick={() => handleDelete(user.id)}
-                                                    className="btn btn-danger btn-compact btn-critical"
+                                                    variant="danger"
+                                                    size="sm"
                                                     disabled={deleting === user.id || banning === user.id}
                                                 >
                                                     {deleting === user.id ? 'Deleting...' : 'Delete'}
-                                                </button>
+                                                </Button>
                                             )}
                                         </div>
                                     </td>
@@ -207,128 +226,97 @@ const AdminUsersPage = () => {
                             ))}
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                </Card>
             )}
 
-            {/* Pagination */}
             {pagination.pages > 1 && (
-                <div className="admin-pagination">
-                    <button
-                        className="btn btn-nav"
+                <div className="flex items-center justify-center gap-3">
+                    <Button
+                        variant="outline"
                         disabled={pagination.page <= 1}
                         onClick={() => fetchUsers(pagination.page - 1, searchQuery)}
                     >
                         Previous
-                    </button>
-                    <span className="admin-pagination-status">
+                    </Button>
+                    <span className="text-sm text-slate-600">
                         Page {pagination.page} of {pagination.pages}
                     </span>
-                    <button
-                        className="btn btn-nav"
+                    <Button
+                        variant="outline"
                         disabled={pagination.page >= pagination.pages}
                         onClick={() => fetchUsers(pagination.page + 1, searchQuery)}
                     >
                         Next
-                    </button>
+                    </Button>
                 </div>
             )}
 
-            {/* User Detail Modal */}
             {selectedUser && (
                 <div
                     onClick={() => setSelectedUser(null)}
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 2000,
-                    }}
+                    className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 px-4 py-6"
                 >
                     <div
                         onClick={(e) => e.stopPropagation()}
-                        style={{
-                            backgroundColor: 'white',
-                            borderRadius: '8px',
-                            padding: '32px',
-                            maxWidth: '500px',
-                            width: '90%',
-                            maxHeight: '80vh',
-                            overflowY: 'auto',
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-                        }}
+                        className="w-full max-w-2xl overflow-y-auto rounded-lg border border-slate-200 bg-white p-6 shadow-md"
                     >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                            <h2 style={{ margin: 0, color: '#003594' }}>User Profile</h2>
-                            <button
-                                onClick={() => setSelectedUser(null)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    fontSize: '1.5rem',
-                                    cursor: 'pointer',
-                                    color: '#666',
-                                    padding: '4px 8px',
-                                }}
-                            >
-                                ×
-                            </button>
+                        <div className="mb-5 flex items-center justify-between">
+                            <h2 className="text-xl font-semibold text-slate-900">User Profile</h2>
+                            <Button onClick={() => setSelectedUser(null)} variant="outline" size="sm">Close</Button>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
-                            <span style={{
-                                backgroundColor: selectedUser.role === 'admin' ? '#e8f0fe' : '#E8E9EE',
-                                color: selectedUser.role === 'admin' ? '#003594' : '#555',
-                                padding: '4px 10px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 'bold',
-                            }}>
+                        <div className="mb-5 flex gap-2">
+                            <span className={[
+                                'rounded-md border px-2 py-1 text-xs font-medium',
+                                selectedUser.role === 'admin'
+                                    ? 'border-indigo-200 bg-indigo-50 text-indigo-700'
+                                    : 'border-slate-200 bg-slate-50 text-slate-700',
+                            ].join(' ')}>
                                 {selectedUser.role}
                             </span>
-                            <span style={{
-                                backgroundColor: selectedUser.is_banned ? '#fde8e8' : '#e8f8f0',
-                                color: selectedUser.is_banned ? '#922b21' : '#1a6e42',
-                                padding: '4px 10px', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 'bold',
-                            }}>
+                            <span className={[
+                                'rounded-md border px-2 py-1 text-xs font-medium',
+                                selectedUser.is_banned
+                                    ? 'border-red-200 bg-red-50 text-red-700'
+                                    : 'border-emerald-200 bg-emerald-50 text-emerald-700',
+                            ].join(' ')}>
                                 {selectedUser.is_banned ? 'Banned' : 'Active'}
                             </span>
                         </div>
 
-                        <div className="responsive-two-col-grid" style={{ gap: '16px' }}>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Name</p>
-                                <p style={{ margin: '4px 0 0 0', fontWeight: 'bold' }}>{selectedUser.name}</p>
+                                <p className="text-xs text-slate-500">Name</p>
+                                <p className="mt-1 text-sm font-semibold text-slate-800">{selectedUser.name}</p>
                             </div>
                             <div>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Email</p>
-                                <p style={{ margin: '4px 0 0 0', fontWeight: 'bold' }}>{selectedUser.email}</p>
+                                <p className="text-xs text-slate-500">Email</p>
+                                <p className="mt-1 text-sm font-semibold text-slate-800">{selectedUser.email}</p>
                             </div>
                             <div>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Age</p>
-                                <p style={{ margin: '4px 0 0 0' }}>{selectedUser.age || 'Not provided'}</p>
+                                <p className="text-xs text-slate-500">Age</p>
+                                <p className="mt-1 text-sm text-slate-700">{selectedUser.age || 'Not provided'}</p>
                             </div>
                             <div>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Gender</p>
-                                <p style={{ margin: '4px 0 0 0' }}>{selectedUser.gender || 'Not provided'}</p>
+                                <p className="text-xs text-slate-500">Gender</p>
+                                <p className="mt-1 text-sm text-slate-700">{selectedUser.gender || 'Not provided'}</p>
                             </div>
                             <div>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Phone</p>
-                                <p style={{ margin: '4px 0 0 0' }}>{selectedUser.phone || 'Not provided'}</p>
+                                <p className="text-xs text-slate-500">Phone</p>
+                                <p className="mt-1 text-sm text-slate-700">{selectedUser.phone || 'Not provided'}</p>
                             </div>
                             <div>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Location</p>
-                                <p style={{ margin: '4px 0 0 0' }}>{selectedUser.location || 'Not provided'}</p>
+                                <p className="text-xs text-slate-500">Location</p>
+                                <p className="mt-1 text-sm text-slate-700">{selectedUser.location || 'Not provided'}</p>
                             </div>
-                            <div style={{ gridColumn: '1 / -1' }}>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Bio</p>
-                                <p style={{ margin: '4px 0 0 0' }}>{selectedUser.bio || 'Not provided'}</p>
+                            <div className="sm:col-span-2">
+                                <p className="text-xs text-slate-500">Bio</p>
+                                <p className="mt-1 text-sm text-slate-700">{selectedUser.bio || 'Not provided'}</p>
                             </div>
                             <div>
-                                <p style={{ margin: 0, color: '#888', fontSize: '0.8rem' }}>Member Since</p>
-                                <p style={{ margin: '4px 0 0 0' }}>{new Date(selectedUser.created_at).toLocaleDateString()}</p>
+                                <p className="text-xs text-slate-500">Member Since</p>
+                                <p className="mt-1 text-sm text-slate-700">{new Date(selectedUser.created_at).toLocaleDateString()}</p>
                             </div>
                         </div>
                     </div>

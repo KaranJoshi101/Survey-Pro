@@ -5,6 +5,7 @@ import responseService from '../services/responseService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
 import BackLink from '../components/BackLink';
+import SeoMeta from '../components/SeoMeta';
 
 const SurveysPage = () => {
     const { isAuthenticated } = useAuth();
@@ -131,7 +132,7 @@ const SurveysPage = () => {
                                     </>
                                 ) : (
                                     <Link
-                                        to={`/surveys/${survey.id}`}
+                                        to={`/surveys/${survey.slug || survey.id}`}
                                         className="btn btn-primary btn-block"
                                         style={{
                                             marginTop: 'auto',
@@ -164,10 +165,19 @@ const SurveysPage = () => {
 
     return (
         <div className="container mt-4">
+            <SeoMeta
+                title="Available Surveys | Survey Pro"
+                description="Explore active surveys and share your responses securely on Survey Pro."
+                keywords={['surveys', 'questionnaire', 'feedback', 'research']}
+                path="/surveys"
+            />
             <BackLink to={backTo} label="Go Back" />
             <h1 style={{ margin: 0, color: '#003594' }}>Available Surveys</h1>
             <p style={{ color: '#555', marginBottom: '24px' }}>
                 Explore and take surveys to share your feedback
+            </p>
+            <p style={{ marginTop: '-12px', marginBottom: '24px' }}>
+                Prefer reading first? <Link to="/articles">Visit published articles</Link>.
             </p>
 
             <div className="market-toolbar">

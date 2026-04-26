@@ -5,6 +5,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import consultingService from '../services/consultingService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
+import { useToast } from '../context/ToastContext';
 
 const quillFormats = [
     'header',
@@ -177,6 +178,7 @@ const AdminConsultingPage = () => {
         priority: 'medium',
         notes: '',
     });
+    const { addToast } = useToast();
     const [templateKey, setTemplateKey] = useState('request_more_information');
     const [emailSubject, setEmailSubject] = useState('');
     const [emailBody, setEmailBody] = useState('');
@@ -193,11 +195,13 @@ const AdminConsultingPage = () => {
             setServices(response.data.services || []);
             setError('');
         } catch (_err) {
-            setError('Failed to load consulting services');
+            const message = 'Failed to load consulting services';
+            setError(message);
+            addToast(message, 'error');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [addToast]);
 
     const fetchRequests = useCallback(async (page = 1) => {
         try {
@@ -206,11 +210,13 @@ const AdminConsultingPage = () => {
             setRequests(response.data.requests || []);
             setRequestsPagination(response.data.pagination || null);
         } catch (_err) {
-            setError('Failed to load consulting requests');
+            const message = 'Failed to load consulting requests';
+            setError(message);
+            addToast(message, 'error');
         } finally {
             setRequestsLoading(false);
         }
-    }, []);
+    }, [addToast]);
 
     useEffect(() => {
         fetchServices();
@@ -291,10 +297,14 @@ const AdminConsultingPage = () => {
         try {
             if (editingId) {
                 await consultingService.updateService(editingId, payload);
-                setSuccess('Consulting service updated successfully');
+                const successMessage = 'Consulting service updated successfully';
+                setSuccess(successMessage);
+                addToast(successMessage, 'success');
             } else {
                 await consultingService.createService(payload);
-                setSuccess('Consulting service created successfully');
+                const successMessage = 'Consulting service created successfully';
+                setSuccess(successMessage);
+                addToast(successMessage, 'success');
             }
 
             closeForm();
@@ -310,6 +320,7 @@ const AdminConsultingPage = () => {
                 : (err.response?.data?.error || 'Failed to save consulting service');
 
             setError(messageText);
+            addToast(messageText, 'error');
         } finally {
             setSubmitting(false);
         }
@@ -324,10 +335,14 @@ const AdminConsultingPage = () => {
             setDeletingId(id);
             await consultingService.deleteService(id);
             setServices((prev) => prev.filter((item) => item.id !== id));
-            setSuccess('Consulting service deleted');
+            const successMessage = 'Consulting service deleted successfully';
+            setSuccess(successMessage);
+            addToast(successMessage, 'success');
             setTimeout(() => setSuccess(''), 2200);
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to delete consulting service');
+            const message = err.response?.data?.error || 'Failed to delete consulting service';
+            setError(message);
+            addToast(message, 'error');
         } finally {
             setDeletingId(null);
         }
@@ -374,7 +389,9 @@ const AdminConsultingPage = () => {
             });
             applyTemplate('request_more_information', detail);
         } catch (_err) {
-            setError('Failed to load request details');
+            const message = 'Failed to load request details';
+            setError(message);
+            addToast(message, 'error');
             setRequestModalOpen(false);
         } finally {
             setRequestModalLoading(false);
@@ -418,7 +435,9 @@ const AdminConsultingPage = () => {
                     : req
             )));
 
-            setSuccess('Consultation request updated successfully');
+            const successMessage = 'Consultation request updated successfully';
+            setSuccess(successMessage);
+            addToast(successMessage, 'success');
             setTimeout(() => setSuccess(''), 2200);
         } catch (err) {
             const validationMessages = err.response?.data?.details
@@ -430,6 +449,7 @@ const AdminConsultingPage = () => {
                 : (err.response?.data?.error || 'Failed to update request');
 
             setError(messageText);
+            addToast(messageText, 'error');
         } finally {
             setRequestModalSaving(false);
         }
@@ -446,10 +466,14 @@ const AdminConsultingPage = () => {
     const handleCopyEmailBody = async () => {
         try {
             await navigator.clipboard.writeText(emailBody || '');
-            setSuccess('Email body copied to clipboard');
+            const successMessage = 'Email body copied to clipboard';
+            setSuccess(successMessage);
+            addToast(successMessage, 'success');
             setTimeout(() => setSuccess(''), 2200);
         } catch (_err) {
-            setError('Failed to copy email body');
+            const message = 'Failed to copy email body';
+            setError(message);
+            addToast(message, 'error');
         }
     };
 

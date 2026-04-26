@@ -5,6 +5,7 @@ import analyticsService from '../services/analyticsService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const API_ORIGIN = API_BASE.replace(/\/api\/?$/, '');
@@ -144,6 +145,7 @@ const validateField = (name, value) => {
 
 const ConsultingDetailPage = () => {
     const { user, isAuthenticated } = useAuth();
+    const { addToast } = useToast();
     const { slug } = useParams();
     const navigate = useNavigate();
     const [service, setService] = useState(null);
@@ -260,7 +262,9 @@ const ConsultingDetailPage = () => {
         if (!service) return;
 
         if (!isAuthenticated) {
-            setFormError('Please login to submit a consulting request.');
+            const message = 'Please login to submit a consulting request.';
+            setFormError(message);
+            addToast(message, 'warning');
             navigate('/login', { state: { from: `/consulting/${slug}` } });
             return;
         }
@@ -278,7 +282,9 @@ const ConsultingDetailPage = () => {
         setFieldErrors(nextErrors);
 
         if (nextErrors.name || nextErrors.email || nextErrors.message) {
-            setFormError('Please fix the highlighted fields and submit again.');
+            const message = 'Please fix the highlighted fields and submit again.';
+            setFormError(message);
+            addToast(message, 'warning');
             return;
         }
 
@@ -330,7 +336,9 @@ const ConsultingDetailPage = () => {
                 fileInput.value = '';
             }
 
-            setFormSuccess("Your request has been submitted. We'll respond within 24 hours.");
+            const successMessage = "Your request has been submitted. We'll respond within 24 hours.";
+            setFormSuccess(successMessage);
+            addToast(successMessage, 'success');
         } catch (err) {
             const validationMessages = err.response?.data?.details
                 ?.map((item) => item.message)
@@ -341,6 +349,7 @@ const ConsultingDetailPage = () => {
                 : (err.response?.data?.error || 'Failed to submit consultation request');
 
             setFormError(messageText);
+            addToast(messageText, 'error');
         } finally {
             setSubmitting(false);
         }

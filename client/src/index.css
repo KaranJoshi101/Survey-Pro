@@ -258,6 +258,27 @@ input:focus, textarea:focus, select:focus {
     opacity: 0.7;
     cursor: not-allowed;
 }
+
+a,
+.back-link {
+    color: #003594;
+    text-decoration: underline;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+a:hover,
+.back-link:hover {
+    color: #001a4a;
+}
+
+.btn,
+.admin-category-action-btn,
+.acad-link-btn,
+.acad-footer-links li button,
+.admin-management-link,
+a[role='button'] {
+    text-decoration: none;
+}
 /* ===== GLOBAL STYLES — Academic Color System =====
    Primary:    #003594 (Royal Blue)
    Accent:     #FFB81C (Gold)

@@ -5,9 +5,9 @@ const articleService = {
     getArticles: (page = 1, limit = 10) =>
         api.get(`/articles?page=${page}&limit=${limit}`),
 
-    // Get article by ID
-    getArticleById: (id) =>
-        api.get(`/articles/${id}`),
+    // Get article by slug (or legacy ID)
+    getArticleById: (identifier) =>
+        api.get(`/articles/${identifier}`),
 
     // Create article (admin)
     createArticle: (title, content) =>
@@ -32,6 +32,26 @@ const articleService = {
     // Unpublish article (admin)
     unpublishArticle: (id) =>
         api.put(`/articles/${id}`, { is_published: false }),
+
+    // Autosave article draft (admin)
+    autosaveArticle: (articleId, data) =>
+        api.put(`/articles/${articleId}/autosave`, data),
+
+    // Save article as draft (admin)
+    saveDraft: (articleId, data) =>
+        api.post(`/articles/${articleId}/drafts`, data),
+
+    // Get article drafts (admin)
+    getArticleDrafts: (articleId) =>
+        api.get(`/articles/${articleId}/drafts`),
+
+    // Update article metadata (SEO fields) (admin)
+    updateArticleMetadata: (id, metadata) =>
+        api.put(`/articles/${id}/metadata`, metadata),
+
+    // Schedule article publishing (admin)
+    scheduleArticlePublish: (id, publishDate) =>
+        api.put(`/articles/${id}/schedule`, { publish_date: publishDate }),
 };
 
 export default articleService;

@@ -3,17 +3,15 @@ import { Link } from 'react-router-dom';
 import {
     FaArrowRight,
     FaCheckCircle,
-    FaGlobe,
     FaIdBadge,
-    FaLaptopCode,
     FaLinkedinIn,
     FaMapMarkerAlt,
     FaPhoneAlt,
     FaUniversity,
     FaUserCircle,
-    FaVial,
     FaEnvelope,
 } from 'react-icons/fa';
+import SeoMeta from '../components/SeoMeta';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -92,6 +90,12 @@ const LandingPage = () => {
 
     return (
         <div className="academic-landing">
+            <SeoMeta
+                title="Survey Pro | Surveys, Training, Articles, and Media"
+                description="Survey Pro is a PERN platform for research surveys, training content, publication-style articles, and media updates."
+                keywords={['survey platform', 'training', 'articles', 'research', 'PERN app']}
+                path="/"
+            />
             {/* ===== NAVBAR ===== */}
             <nav className="acad-navbar">
                 <button

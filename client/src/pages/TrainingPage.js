@@ -1,14 +1,19 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import trainingService from '../services/trainingService';
 import analyticsService from '../services/analyticsService';
 import BackLink from '../components/BackLink';
 import { useAuth } from '../context/AuthContext';
+import SeoMeta from '../components/SeoMeta';
+import { toSlug } from '../utils/slug';
 import './TrainingPage.css';
 
 const thumbnailFor = (youtubeId) => `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
 
 const TrainingPage = () => {
     const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+    const { category: categorySlug, slug: playlistSlug } = useParams();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [playlistVideosLoading, setPlaylistVideosLoading] = useState(false);
@@ -72,7 +77,7 @@ const TrainingPage = () => {
         }
     }, []);
 
-    const openPlaylist = async (playlist) => {
+    const openPlaylist = useCallback(async (playlist) => {
         try {
             setPlaylistVideosLoading(true);
             setSelectedPlaylist(playlist);
@@ -89,12 +94,15 @@ const TrainingPage = () => {
             setSelectedPlaylist(hydratedPlaylist);
             setSelectedVideo(playlistVideos[0] || null);
             setError('');
+            if (selectedCategory?.name && playlist?.name) {
+                navigate(`/training/${toSlug(selectedCategory.name)}/${toSlug(playlist.name)}`, { replace: true });
+            }
         } catch (_err) {
             setError('Failed to load selected playlist videos.');
         } finally {
             setPlaylistVideosLoading(false);
         }
-    };
+    }, [navigate, selectedCategory]);
 
     const resetToCategories = () => {
         setSelectedCategory(null);
@@ -102,17 +110,44 @@ const TrainingPage = () => {
         setSelectedPlaylist(null);
         setSelectedVideo(null);
         setError('');
+        navigate('/training', { replace: true });
     };
 
     const resetToCategoryVideos = () => {
         setSelectedPlaylist(null);
         setSelectedVideo(null);
         setError('');
+        if (selectedCategory?.name) {
+            navigate(`/training/${toSlug(selectedCategory.name)}`, { replace: true });
+        }
     };
 
     useEffect(() => {
         fetchCategories();
     }, [fetchCategories]);
+
+    useEffect(() => {
+        if (!categories.length || !categorySlug) {
+            return;
+        }
+
+        const matchedCategory = categories.find((item) => toSlug(item.name) === categorySlug);
+        if (!matchedCategory) {
+            return;
+        }
+
+        if (!selectedCategory || selectedCategory.id !== matchedCategory.id) {
+            setSelectedCategory(matchedCategory);
+        }
+
+        if (playlistSlug) {
+            const matchedPlaylist = (matchedCategory.playlists || []).find((item) => toSlug(item.name) === playlistSlug);
+            if (matchedPlaylist && (!selectedPlaylist || selectedPlaylist.id !== matchedPlaylist.id)) {
+                setSelectedSection('videos');
+                openPlaylist(matchedPlaylist);
+            }
+        }
+    }, [categories, categorySlug, openPlaylist, playlistSlug, selectedCategory, selectedPlaylist]);
 
     useEffect(() => {
         if (!selectedCategory?.id) return;
@@ -158,11 +193,22 @@ const TrainingPage = () => {
 
     return (
         <div className="container mt-4 training-page-wrap space-y-6">
+            <SeoMeta
+                title={selectedPlaylist ? `${selectedPlaylist.name} | Training | Survey Pro` : 'Training Platform | Survey Pro'}
+                description={selectedPlaylist?.description || selectedCategory?.description || 'Explore categorized training videos and notes on Survey Pro.'}
+                keywords={['training videos', 'learning playlists', 'survey training']}
+                path={selectedPlaylist && selectedCategory
+                    ? `/training/${toSlug(selectedCategory.name)}/${toSlug(selectedPlaylist.name)}`
+                    : '/training'}
+            />
             {!selectedCategory && !selectedSection && !selectedPlaylist && <BackLink to={backTo} label="Go Back" />}
 
             <header className="training-header pb-2 transition-all duration-200 ease-in-out">
                 <h1>Training Platform</h1>
                 <p>Choose a category, then explore notes or videos.</p>
+                <p style={{ marginTop: '8px' }}>
+                    Complement your learning with <Link to="/articles">published articles</Link>.
+                </p>
             </header>
 
             {error && <div className="alert alert-info alert-danger">{error}</div>}
@@ -350,7 +396,7 @@ const TrainingPage = () => {
                                             >
                                                 <div className="playlist-thumb-wrap">
                                                     {playlist.thumbnail ? (
-                                                        <img src={playlist.thumbnail} alt={playlist.name} className="playlist-thumb" />
+                                                        <img src={playlist.thumbnail} alt={playlist.name} className="playlist-thumb" loading="lazy" />
                                                     ) : (
                                                         <div className="playlist-thumb fallback">No Preview</div>
                                                     )}

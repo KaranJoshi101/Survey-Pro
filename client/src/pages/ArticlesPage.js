@@ -5,6 +5,7 @@ import api from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
 import { useAuth } from '../context/AuthContext';
+import SeoMeta from '../components/SeoMeta';
 
 const stripHtml = (html) => {
     const tmp = document.createElement('div');
@@ -88,10 +89,19 @@ const ArticlesPage = () => {
 
     return (
         <div className="container mt-4">
+            <SeoMeta
+                title="Published Articles | Survey Pro"
+                description="Read published insights, research notes, and practical guidance from Survey Pro."
+                keywords={['published articles', 'survey research', 'guides', 'insights']}
+                path="/articles"
+            />
             <BackLink to={backTo} label="Back" />
             <h1 style={{ margin: '16px 0 8px 0', color: '#003594' }}>Published Articles</h1>
             <p style={{ color: '#555', marginBottom: '32px' }}>
                 Read helpful articles and guides
+            </p>
+            <p style={{ marginTop: '-16px', marginBottom: '28px' }}>
+                Looking for questionnaires instead? <Link to="/surveys">Browse live surveys</Link>.
             </p>
 
             {error && <div className="alert alert-danger">{error}</div>}
@@ -111,7 +121,7 @@ const ArticlesPage = () => {
                             <div className="card-body">
                                 <h2 style={{ marginTop: '0', marginBottom: '12px' }}>
                                     <Link
-                                        to={`/articles/${article.id}`}
+                                        to={`/articles/${article.slug || article.id}`}
                                         style={{ color: '#003594', textDecoration: 'none' }}
                                     >
                                         {article.title}
@@ -125,7 +135,7 @@ const ArticlesPage = () => {
                                     {stripHtml(article.content).substring(0, 200)}...
                                 </p>
                                 <Link
-                                    to={`/articles/${article.id}`}
+                                    to={`/articles/${article.slug || article.id}`}
                                     className="btn btn-primary"
                                     style={{ fontSize: '0.95rem' }}
                                 >

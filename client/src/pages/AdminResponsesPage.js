@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FaArrowRight } from 'react-icons/fa';
 import surveyService from '../services/surveyService';
 import responseService from '../services/responseService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
+import Button from '../components/ui/Button';
+import Card, { CardBody, CardHeader } from '../components/ui/Card';
+import Input from '../components/ui/Input';
 
 const AdminResponsesPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -140,213 +142,169 @@ const AdminResponsesPage = () => {
     }
 
     return (
-        <div className="container mt-4">
+        <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
             <BackLink to="/admin/surveys" label="Back to Manage Surveys and Feedbacks" />
-            <h1 style={{ color: '#003594' }}>Survey Responses & Analytics</h1>
+            <Card>
+                <CardHeader>
+                    <h1 className="text-2xl font-semibold text-slate-900">Survey Responses and Analytics</h1>
+                    <p className="mt-1 text-sm text-slate-500">Review submissions and open detailed analytics reports.</p>
+                </CardHeader>
+            </Card>
 
-            {error && <div className="alert alert-danger">{error}</div>}
+            {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-            <div className="admin-responses-layout">
-                {/* Surveys List */}
-                <div>
-                    <div className="card">
-                        <div className="card-body">
-                            <h2 style={{ marginTop: 0 }}>Surveys</h2>
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+                <div className="lg:col-span-4 xl:col-span-3">
+                    <Card>
+                        <CardHeader>
+                            <h2 className="text-base font-semibold text-slate-900">Surveys</h2>
+                        </CardHeader>
+                        <CardBody>
                             {surveys.length === 0 ? (
-                                <p style={{ color: '#666' }}>No surveys available</p>
+                                <p className="text-sm text-slate-600">No surveys available</p>
                             ) : (
-                                <div className="admin-responses-survey-list">
+                                <div className="space-y-2">
                                     {surveys.map((survey) => (
                                         <div
                                             key={survey.id}
                                             onClick={() => handleSelectSurvey(survey)}
-                                            style={{
-                                                padding: '12px',
-                                                marginBottom: '8px',
-                                                borderRadius: '4px',
-                                                backgroundColor: selectedSurvey?.id === survey.id ? '#003594' : '#f8f9fa',
-                                                color: selectedSurvey?.id === survey.id ? 'white' : '#333',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s',
-                                                border: '1px solid ' + (selectedSurvey?.id === survey.id ? '#002570' : '#d1d5db'),
-                                            }}
-                                            onMouseOver={(e) => {
-                                                e.currentTarget.style.backgroundColor = selectedSurvey?.id === survey.id ? '#002570' : '#e8f0fe';
-                                            }}
-                                            onMouseOut={(e) => {
-                                                e.currentTarget.style.backgroundColor = selectedSurvey?.id === survey.id ? '#003594' : '#f8f9fa';
-                                            }}
+                                            className={[
+                                                'cursor-pointer rounded-lg border px-3 py-3 transition-all duration-200',
+                                                selectedSurvey?.id === survey.id
+                                                    ? 'border-slate-800 bg-slate-900 text-white'
+                                                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
+                                            ].join(' ')}
                                         >
                                             <strong>{survey.title}</strong>
-                                            <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', opacity: 0.8 }}>
+                                            <p className="mt-1 text-xs opacity-80">
                                                 Status: {survey.status}
                                             </p>
                                         </div>
                                     ))}
                                 </div>
                             )}
-                        </div>
-                    </div>
+                        </CardBody>
+                    </Card>
                 </div>
 
-                {/* Responses & Analytics */}
-                <div>
+                <div className="lg:col-span-8 xl:col-span-9">
                     {!selectedSurvey ? (
-                        <div className="card">
-                            <div className="card-body" style={{ textAlign: 'center', padding: '40px' }}>
-                                <p style={{ color: '#666', fontSize: '1.1rem' }}>
+                        <Card>
+                            <CardBody className="py-10 text-center">
+                                <p className="text-sm text-slate-600">
                                     Select a survey to view responses and analytics
                                 </p>
-                            </div>
-                        </div>
+                            </CardBody>
+                        </Card>
                     ) : loadingResponses ? (
                         <LoadingSpinner fullScreen={false} />
                     ) : (
                         <>
-                            {/* Analytics Summary */}
                             {analytics && (
-                                <div className="card" style={{ marginBottom: '24px' }}>
-                                    <div className="card-body">
-                                        <h3>Analytics for "{selectedSurvey.title}"</h3>
-                                        <div className="responsive-three-col-grid" style={{ gap: '16px', marginTop: '16px' }}>
-                                            <div style={{
-                                                padding: '16px',
-                                                backgroundColor: '#e8f0fe',
-                                                borderRadius: '4px',
-                                                borderLeft: '4px solid #003594',
-                                            }}>
-                                                <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Total Responses</p>
-                                                <h2 style={{ margin: '8px 0 0 0', color: '#003594' }}>
+                                <Card className="mb-5">
+                                    <CardBody>
+                                        <h3 className="text-base font-semibold text-slate-900">Analytics for "{selectedSurvey.title}"</h3>
+                                        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+                                            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                                <p className="text-xs font-medium text-slate-500">Total Responses</p>
+                                                <h2 className="mt-2 text-2xl font-semibold text-slate-900">
                                                     {analytics.total_responses || responses.length}
                                                 </h2>
                                             </div>
 
-                                            <div style={{
-                                                padding: '16px',
-                                                backgroundColor: '#e8f8f0',
-                                                borderRadius: '4px',
-                                                borderLeft: '4px solid #27ae60',
-                                            }}>
-                                                <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Unique Users</p>
-                                                <h2 style={{ margin: '8px 0 0 0', color: '#27ae60' }}>
+                                            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                                <p className="text-xs font-medium text-slate-500">Unique Users</p>
+                                                <h2 className="mt-2 text-2xl font-semibold text-slate-900">
                                                     {analytics.unique_users || new Set(responses.map(r => r.user_id)).size}
                                                 </h2>
                                             </div>
 
-                                            <div style={{
-                                                padding: '16px',
-                                                backgroundColor: '#fff8e1',
-                                                borderRadius: '4px',
-                                                borderLeft: '4px solid #FFB81C',
-                                            }}>
-                                                <p style={{ margin: 0, color: '#666', fontSize: '0.9rem' }}>Questions</p>
-                                                <h2 style={{ margin: '8px 0 0 0', color: '#b8860b' }}>
+                                            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                                                <p className="text-xs font-medium text-slate-500">Questions</p>
+                                                <h2 className="mt-2 text-2xl font-semibold text-slate-900">
                                                     {analytics.analytics ? analytics.analytics.length : 0}
                                                 </h2>
                                             </div>
                                         </div>
-                                        <div style={{ marginTop: '16px', textAlign: 'right', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                                            <button
+                                        <div className="mt-4 flex justify-end gap-2">
+                                            <Button
                                                 onClick={handleExportExcel}
                                                 disabled={exporting}
-                                                className="btn btn-secondary"
-                                                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                                                variant="outline"
                                             >
                                                 {exporting ? 'Exporting...' : 'Download Excel'}
-                                            </button>
+                                            </Button>
                                             <Link
                                                 to={`/admin/surveys/${selectedSurvey.id}/analytics`}
-                                                className="btn btn-primary"
-                                                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                                                className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-900 bg-slate-900 px-4 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-slate-800 hover:shadow-md"
                                             >
-                                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                                                    View Full Analytics
-                                                    <FaArrowRight size={12} aria-hidden="true" />
-                                                </span>
+                                                View Full Analytics
                                             </Link>
                                         </div>
-                                    </div>
-                                </div>
+                                    </CardBody>
+                                </Card>
                             )}
 
-                            {/* Search */}
-                            <div className="card" style={{ marginBottom: '24px' }}>
-                                <div className="card-body">
-                                    <input
+                            <Card className="mb-5">
+                                <CardBody>
+                                    <Input
                                         type="text"
                                         placeholder="Search by name, email, or user ID..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="form-control"
                                     />
-                                    <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '0.85rem' }}>
+                                    <p className="mt-2 text-xs text-slate-500">
                                         Showing {filteredResponses.length} of {responses.length} responses
                                     </p>
-                                </div>
-                            </div>
+                                </CardBody>
+                            </Card>
 
-                            {/* Responses List */}
-                            <div className="card">
-                                <div className="card-body">
-                                    <h3>Responses ({filteredResponses.length})</h3>
+                            <Card>
+                                <CardHeader>
+                                    <h3 className="text-base font-semibold text-slate-900">Responses ({filteredResponses.length})</h3>
+                                </CardHeader>
+                                <CardBody>
                                     {filteredResponses.length === 0 ? (
-                                        <p style={{ color: '#666', textAlign: 'center', padding: '24px' }}>
+                                        <p className="py-6 text-center text-sm text-slate-600">
                                             No responses found
                                         </p>
                                     ) : (
-                                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                                        <div className="max-h-[500px] space-y-3 overflow-y-auto">
                                             {filteredResponses.map((response, index) => (
                                                 <div
                                                     key={response.id}
-                                                    style={{
-                                                        padding: '12px',
-                                                        marginBottom: '12px',
-                                                        borderRadius: '4px',
-                                                        backgroundColor: '#f0f4f8',
-                                                        borderLeft: '4px solid #003594',
-                                                    }}
+                                                    className="rounded-lg border border-slate-200 bg-slate-50 p-3"
                                                 >
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                                                        <div style={{ flex: '1 1 220px', minWidth: 0 }}>
-                                                            <p style={{ margin: 0, fontWeight: 'bold', marginBottom: '4px' }}>
+                                                    <div className="flex flex-wrap items-start justify-between gap-2">
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="mb-1 text-sm font-semibold text-slate-800">
                                                                 {index + 1}. {response.user_name || 'Anonymous User'}
                                                             </p>
-                                                            <p style={{ margin: '4px 0', color: '#666', fontSize: '0.85rem' }}>
+                                                            <p className="text-xs text-slate-500">
                                                                 Email: {response.user_email || 'N/A'}
                                                             </p>
-                                                            <p style={{ margin: '4px 0', color: '#666', fontSize: '0.85rem' }}>
+                                                            <p className="mt-1 text-xs text-slate-500">
                                                                 Submitted: {new Date(response.submitted_at).toLocaleString()}
                                                             </p>
                                                         </div>
-                                                        <span
-                                                            style={{
-                                                                display: 'inline-block',
-                                                                backgroundColor: '#d4edda',
-                                                                color: '#155724',
-                                                                padding: '4px 8px',
-                                                                borderRadius: '4px',
-                                                                fontSize: '0.85rem',
-                                                                fontWeight: 'bold',
-                                                            }}
-                                                        >
-                                                            ✓ Completed
+                                                        <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
+                                                            Completed
                                                         </span>
                                                     </div>
 
-                                                    {/* Responses Summary */}
                                                     {response.answers && response.answers.length > 0 && (
-                                                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #dee2e6' }}>
-                                                            <p style={{ margin: 0, fontSize: '0.85rem', color: '#666', marginBottom: '8px' }}>
+                                                        <div className="mt-3 border-t border-slate-200 pt-3">
+                                                            <p className="mb-2 text-xs text-slate-500">
                                                                 <strong>Answers:</strong> {response.answers.length} questions answered
                                                             </p>
-                                                            <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                                                            <div className="space-y-1 text-xs text-slate-500">
                                                                 {response.answers.slice(0, 2).map((answer, idx) => (
-                                                                    <p key={idx} style={{ margin: '4px 0' }}>
-                                                                        • {answer.question_text?.substring(0, 50)}...
+                                                                    <p key={idx}>
+                                                                        - {answer.question_text?.substring(0, 50)}...
                                                                     </p>
                                                                 ))}
                                                                 {response.answers.length > 2 && (
-                                                                    <p style={{ margin: '4px 0', fontStyle: 'italic' }}>
+                                                                    <p className="italic">
                                                                         + {response.answers.length - 2} more answers
                                                                     </p>
                                                                 )}
@@ -357,8 +315,8 @@ const AdminResponsesPage = () => {
                                             ))}
                                         </div>
                                     )}
-                                </div>
-                            </div>
+                                </CardBody>
+                            </Card>
                         </>
                     )}
                 </div>

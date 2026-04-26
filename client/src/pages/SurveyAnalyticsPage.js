@@ -14,6 +14,7 @@ import { Bar, Doughnut } from 'react-chartjs-2';
 import responseService from '../services/responseService';
 import userService from '../services/userService';
 import LoadingSpinner from '../components/LoadingSpinner';
+import BackLink from '../components/BackLink';
 
 ChartJS.register(
     CategoryScale,
@@ -295,7 +296,7 @@ const SurveyAnalyticsPage = () => {
         return (
             <div className="container mt-4">
                 <div className="alert alert-danger">{error}</div>
-                <Link to="/admin/surveys" className="btn btn-primary">Back to Manage Surveys and Feedbacks</Link>
+                <BackLink to="/admin/surveys" label="Back to Manage Surveys and Feedbacks" />
             </div>
         );
     }

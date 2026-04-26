@@ -1,8 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
 import surveyService from '../services/surveyService';
+import { useToast } from '../context/ToastContext';
+import { validateSurvey } from '../utils/validation';
 import LoadingSpinner from '../components/LoadingSpinner';
+import QuestionCard from '../components/QuestionCard';
+import SurveySettingsPanel from '../components/SurveySettingsPanel';
+import Button from '../components/ui/Button';
+import Card, { CardBody, CardHeader } from '../components/ui/Card';
+import Input from '../components/ui/Input';
+import Textarea from '../components/ui/Textarea';
 
 const QUESTION_TYPES = [
     { value: 'text', label: 'Long Text' },
@@ -14,15 +21,6 @@ const QUESTION_TYPES = [
 ];
 
 const OPTION_BASED_TYPES = new Set(['multiple_choice', 'checkbox']);
-
-const QUESTION_TYPE_HINTS = {
-    text: 'Multi-line free-form response. Users can enter any text across multiple lines.',
-    text_only: 'Single-line text. Accepts letters and spaces only — no numbers or symbols.',
-    number_only: 'Numeric response only. Useful for age, count, score, etc.',
-    multiple_choice: 'Users select one option. Add at least 2 options below.',
-    checkbox: 'Users can select multiple options. Add at least 2 options below.',
-    rating: 'Users choose a score from 1 to 5.',
-};
 
 const makeLocalId = () => `local_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
@@ -45,15 +43,57 @@ const normalizeQuestions = (questions) => (questions || []).map((question, index
     question_text: question.question_text || '',
     question_type: question.question_type || 'text',
     is_required: question.is_required !== false,
+    description: question.description || '',
+    help_text: question.help_text || '',
     order_index: question.order_index ?? index + 1,
     options: normalizeOptions(question.options),
 }));
 
+const serializeSurveyState = ({
+    title,
+    description,
+    submissionEmailSubject,
+    submissionEmailBody,
+    submissionEmailAttachments,
+    surveySettings,
+    questions,
+}) => JSON.stringify({
+    title: (title || '').trim(),
+    description: (description || '').trim(),
+    submissionEmailSubject: (submissionEmailSubject || '').trim(),
+    submissionEmailBody: (submissionEmailBody || '').trim(),
+    submissionEmailAttachments: (submissionEmailAttachments || []).map((item) => (
+        item?.path || item?.url || item?.name || ''
+    )),
+    surveySettings: {
+        allow_multiple_submissions: Boolean(surveySettings?.allow_multiple_submissions),
+        is_anonymous: Boolean(surveySettings?.is_anonymous),
+        collect_email: Boolean(surveySettings?.collect_email),
+        expiry_date: surveySettings?.expiry_date || null,
+    },
+    questions: (questions || []).map((question, index) => ({
+        id: question.id || null,
+        question_text: (question.question_text || '').trim(),
+        question_type: question.question_type || 'text',
+        is_required: question.is_required !== false,
+        description: (question.description || '').trim(),
+        help_text: (question.help_text || '').trim(),
+        order_index: question.order_index ?? index + 1,
+        options: (question.options || []).map((option, optionIndex) => ({
+            id: option.id || null,
+            option_text: (option.option_text || '').trim(),
+            order_index: option.order_index ?? optionIndex + 1,
+        })),
+    })),
+});
+
 const CreateSurveyPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const { addToast } = useToast();
     const isEditMode = !!id;
 
+    // Form state
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [submissionEmailSubject, setSubmissionEmailSubject] = useState('');
@@ -62,27 +102,70 @@ const CreateSurveyPage = () => {
     const [questions, setQuestions] = useState([]);
     const [originalQuestions, setOriginalQuestions] = useState([]);
 
+    // UI state
     const [loading, setLoading] = useState(isEditMode);
     const [submitting, setSubmitting] = useState(false);
     const [uploadingAttachments, setUploadingAttachments] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    // Advanced features state
+    const [previewMode, setPreviewMode] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [autosaving, setAutosaving] = useState(false);
+    const [draggedQuestion, setDraggedQuestion] = useState(null);
+    const [editingQuestionIndex, setEditingQuestionIndex] = useState(null);
+
+    const [surveySettings, setSurveySettings] = useState({
+        allow_multiple_submissions: false,
+        is_anonymous: false,
+        collect_email: false,
+        expiry_date: null,
+    });
+
+    // Refs for autosave and timers
+    const autosaveTimerRef = useRef(null);
     const successTimerRef = useRef(null);
+    const unsavedChangesRef = useRef(false);
+    const lastSavedStateRef = useRef('');
 
-    const clearSuccessSoon = () => {
-        if (successTimerRef.current) {
-            clearTimeout(successTimerRef.current);
-        }
-        successTimerRef.current = setTimeout(() => setSuccess(''), 2500);
-    };
+    // Cleanup on unmount
+    useEffect(() => {
+        lastSavedStateRef.current = serializeSurveyState({
+            title: '',
+            description: '',
+            submissionEmailSubject: '',
+            submissionEmailBody: '',
+            submissionEmailAttachments: [],
+            surveySettings: {
+                allow_multiple_submissions: false,
+                is_anonymous: false,
+                collect_email: false,
+                expiry_date: null,
+            },
+            questions: [],
+        });
 
-    useEffect(() => () => {
-        if (successTimerRef.current) {
-            clearTimeout(successTimerRef.current);
-        }
+        return () => {
+            if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+            if (successTimerRef.current) clearTimeout(successTimerRef.current);
+        };
     }, []);
 
+    // Warn on unsaved changes before leaving
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (unsavedChangesRef.current && !submitting) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [submitting]);
+
+    // Load survey data
     useEffect(() => {
         if (!isEditMode) {
             setLoading(false);
@@ -100,10 +183,35 @@ const CreateSurveyPage = () => {
                 setSubmissionEmailBody(survey?.submission_email_body || '');
                 setSubmissionEmailAttachments(Array.isArray(survey?.submission_email_attachments) ? survey.submission_email_attachments : []);
 
+                setSurveySettings({
+                    allow_multiple_submissions: survey?.allow_multiple_submissions || false,
+                    is_anonymous: survey?.is_anonymous || false,
+                    collect_email: survey?.collect_email || false,
+                    expiry_date: survey?.expiry_date || null,
+                });
+
                 const normalized = normalizeQuestions(survey?.questions || []);
+                lastSavedStateRef.current = serializeSurveyState({
+                    title: survey?.title || '',
+                    description: survey?.description || '',
+                    submissionEmailSubject: survey?.submission_email_subject || '',
+                    submissionEmailBody: survey?.submission_email_body || '',
+                    submissionEmailAttachments: Array.isArray(survey?.submission_email_attachments)
+                        ? survey.submission_email_attachments
+                        : [],
+                    surveySettings: {
+                        allow_multiple_submissions: survey?.allow_multiple_submissions || false,
+                        is_anonymous: survey?.is_anonymous || false,
+                        collect_email: survey?.collect_email || false,
+                        expiry_date: survey?.expiry_date || null,
+                    },
+                    questions: normalized,
+                });
                 setQuestions(normalized);
                 setOriginalQuestions(normalized);
+                unsavedChangesRef.current = false;
             } catch (err) {
+                addToast(err.response?.data?.error || 'Failed to load survey', 'error');
                 setError(err.response?.data?.error || 'Failed to load survey');
             } finally {
                 setLoading(false);
@@ -111,25 +219,98 @@ const CreateSurveyPage = () => {
         };
 
         fetchSurvey();
-    }, [id, isEditMode]);
+    }, [id, isEditMode, addToast]);
+
+    // Track unsaved changes
+    useEffect(() => {
+        const currentSnapshot = serializeSurveyState({
+            title,
+            description,
+            submissionEmailSubject,
+            submissionEmailBody,
+            submissionEmailAttachments,
+            surveySettings,
+            questions,
+        });
+
+        unsavedChangesRef.current = currentSnapshot !== lastSavedStateRef.current;
+    }, [title, description, questions, surveySettings, submissionEmailSubject, submissionEmailBody, submissionEmailAttachments]);
+
+    // Autosave functionality (debounced)
+    useEffect(() => {
+        if (!isEditMode || !unsavedChangesRef.current) {
+            return;
+        }
+
+        if (autosaveTimerRef.current) {
+            clearTimeout(autosaveTimerRef.current);
+        }
+
+        autosaveTimerRef.current = setTimeout(async () => {
+            if (!id) return;
+
+            try {
+                setAutosaving(true);
+                await surveyService.autosaveSurvey(id, {
+                    title,
+                    description,
+                    questions: questions.map((q) => ({
+                        ...q,
+                        localId: undefined,
+                    })),
+                    settings: surveySettings,
+                });
+                lastSavedStateRef.current = serializeSurveyState({
+                    title,
+                    description,
+                    submissionEmailSubject,
+                    submissionEmailBody,
+                    submissionEmailAttachments,
+                    surveySettings,
+                    questions,
+                });
+                unsavedChangesRef.current = false;
+                addToast('Draft saved automatically', 'info');
+            } catch (err) {
+                console.error('Autosave failed:', err);
+            } finally {
+                setAutosaving(false);
+            }
+        }, 5000); // Autosave after 5 seconds of inactivity
+    }, [
+        id,
+        isEditMode,
+        title,
+        description,
+        questions,
+        surveySettings,
+        submissionEmailSubject,
+        submissionEmailBody,
+        submissionEmailAttachments,
+        addToast,
+    ]);
 
     const canSubmit = useMemo(() => {
-        return title.trim().length > 0 && !submitting;
-    }, [title, submitting]);
+        return title.trim().length > 0 && !submitting && !autosaving;
+    }, [title, submitting, autosaving]);
+
+    const clearSuccessSoon = () => {
+        if (successTimerRef.current) clearTimeout(successTimerRef.current);
+        successTimerRef.current = setTimeout(() => setSuccess(''), 2500);
+    };
 
     const handleAttachmentFilesSelected = async (event) => {
         const files = event.target.files;
-        if (!files || files.length === 0) {
-            return;
-        }
+        if (!files || files.length === 0) return;
 
         try {
             setUploadingAttachments(true);
             const response = await surveyService.uploadSurveyEmailAttachments(files);
             const uploaded = Array.isArray(response.data?.attachments) ? response.data.attachments : [];
             setSubmissionEmailAttachments((prev) => [...prev, ...uploaded]);
+            addToast('Attachments uploaded successfully', 'success');
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to upload email attachments');
+            addToast(err.response?.data?.error || 'Failed to upload attachments', 'error');
         } finally {
             setUploadingAttachments(false);
             event.target.value = '';
@@ -148,10 +329,33 @@ const CreateSurveyPage = () => {
                 question_text: '',
                 question_type: 'text',
                 is_required: true,
+                description: '',
+                help_text: '',
                 order_index: prev.length + 1,
                 options: [],
             },
         ]);
+        addToast('Question added', 'info');
+    };
+
+    const duplicateQuestion = (index) => {
+        const question = questions[index];
+        const newQuestion = {
+            ...question,
+            id: undefined,
+            localId: makeLocalId(),
+            options: (question.options || []).map((opt) => ({
+                ...opt,
+                id: undefined,
+                localId: makeLocalId(),
+            })),
+        };
+        setQuestions((prev) => {
+            const updated = [...prev];
+            updated.splice(index + 1, 0, newQuestion);
+            return updated.map((q, i) => ({ ...q, order_index: i + 1 }));
+        });
+        addToast('Question duplicated', 'info');
     };
 
     const updateQuestion = (localId, updater) => {
@@ -174,6 +378,32 @@ const CreateSurveyPage = () => {
         setQuestions((prev) => prev
             .filter((question) => question.localId !== localId)
             .map((question, index) => ({ ...question, order_index: index + 1 })));
+        addToast('Question removed', 'info');
+    };
+
+    // Drag and drop support
+    const handleDragStart = (index) => {
+        setDraggedQuestion(index);
+    };
+
+    const handleQuestionMove = (targetIndex) => {
+        if (draggedQuestion === null || draggedQuestion === targetIndex) return;
+
+        setQuestions((prev) => {
+            const reordered = [...prev];
+            const [moved] = reordered.splice(draggedQuestion, 1);
+            reordered.splice(targetIndex, 0, moved);
+            return reordered.map((question, index) => ({
+                ...question,
+                order_index: index + 1,
+            }));
+        });
+
+        setDraggedQuestion(targetIndex);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedQuestion(null);
     };
 
     const addOption = (questionLocalId) => {
@@ -211,25 +441,13 @@ const CreateSurveyPage = () => {
     };
 
     const validateDraft = () => {
-        if (!title.trim()) {
-            return 'Survey title is required';
-        }
+        const validation = validateSurvey({
+            title,
+            questions,
+        });
 
-        for (let i = 0; i < questions.length; i += 1) {
-            const question = questions[i];
-            if (!question.question_text.trim()) {
-                return `Question ${i + 1} text is required`;
-            }
-
-            if (OPTION_BASED_TYPES.has(question.question_type)) {
-                const nonEmptyOptions = (question.options || [])
-                    .map((option) => option.option_text.trim())
-                    .filter(Boolean);
-
-                if (nonEmptyOptions.length < 2) {
-                    return `Question ${i + 1} needs at least 2 options`;
-                }
-            }
+        if (!validation.valid) {
+            return validation.errors[0];
         }
 
         return '';
@@ -267,9 +485,36 @@ const CreateSurveyPage = () => {
 
     const syncQuestions = async (surveyId) => {
         const prevById = new Map(originalQuestions.filter((q) => q.id).map((q) => [q.id, q]));
+        const seenQuestionIds = new Set();
 
         const nextQuestions = questions
-            .map((question, index) => ({ ...question, order_index: index + 1 }))
+            .map((question, index) => {
+                const normalizedQuestion = { ...question, order_index: index + 1 };
+
+                if (normalizedQuestion.id && seenQuestionIds.has(normalizedQuestion.id)) {
+                    normalizedQuestion.id = undefined;
+                }
+
+                if (normalizedQuestion.id) {
+                    seenQuestionIds.add(normalizedQuestion.id);
+                }
+
+                if (Array.isArray(normalizedQuestion.options)) {
+                    const seenOptionIds = new Set();
+                    normalizedQuestion.options = normalizedQuestion.options.map((option) => {
+                        const normalizedOption = { ...option };
+                        if (normalizedOption.id && seenOptionIds.has(normalizedOption.id)) {
+                            normalizedOption.id = undefined;
+                        }
+                        if (normalizedOption.id) {
+                            seenOptionIds.add(normalizedOption.id);
+                        }
+                        return normalizedOption;
+                    });
+                }
+
+                return normalizedQuestion;
+            })
             .filter((question) => question.question_text.trim());
 
         const nextQuestionIds = new Set(nextQuestions.filter((q) => q.id).map((q) => q.id));
@@ -286,6 +531,8 @@ const CreateSurveyPage = () => {
                 question_type: question.question_type,
                 is_required: question.is_required,
                 order_index: question.order_index,
+                description: question.description || null,
+                help_text: question.help_text || null,
             };
 
             if (question.id) {
@@ -300,13 +547,7 @@ const CreateSurveyPage = () => {
                     }
                 }
             } else {
-                const response = await surveyService.addQuestion(
-                    surveyId,
-                    payload.question_text,
-                    payload.question_type,
-                    payload.is_required,
-                    payload.order_index
-                );
+                const response = await surveyService.addQuestion(surveyId, payload);
 
                 if (OPTION_BASED_TYPES.has(question.question_type)) {
                     const createdQuestionId = response.data?.question?.id;
@@ -333,6 +574,7 @@ const CreateSurveyPage = () => {
 
         const validationError = validateDraft();
         if (validationError) {
+            addToast(validationError, 'error');
             setError(validationError);
             return;
         }
@@ -349,6 +591,7 @@ const CreateSurveyPage = () => {
                     submission_email_subject: submissionEmailSubject.trim() || null,
                     submission_email_body: submissionEmailBody.trim() || null,
                     submission_email_attachments: submissionEmailAttachments,
+                    ...surveySettings,
                 });
             } else {
                 const createResponse = await surveyService.createSurvey({
@@ -357,6 +600,7 @@ const CreateSurveyPage = () => {
                     submission_email_subject: submissionEmailSubject.trim() || null,
                     submission_email_body: submissionEmailBody.trim() || null,
                     submission_email_attachments: submissionEmailAttachments,
+                    ...surveySettings,
                 });
                 surveyId = createResponse.data?.survey?.id;
             }
@@ -367,15 +611,29 @@ const CreateSurveyPage = () => {
             const normalized = normalizeQuestions(refreshed.data?.survey?.questions || []);
             setQuestions(normalized);
             setOriginalQuestions(normalized);
+            lastSavedStateRef.current = serializeSurveyState({
+                title,
+                description,
+                submissionEmailSubject,
+                submissionEmailBody,
+                submissionEmailAttachments,
+                surveySettings,
+                questions: normalized,
+            });
+            unsavedChangesRef.current = false;
 
-            setSuccess(isEditMode ? 'Survey updated successfully.' : 'Survey created successfully.');
+            const message = isEditMode ? 'Survey updated successfully.' : 'Survey created successfully.';
+            addToast(message, 'success');
+            setSuccess(message);
             clearSuccessSoon();
 
             if (!isEditMode) {
                 navigate(`/admin/surveys/${surveyId}/edit`);
             }
         } catch (err) {
-            setError(err.response?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} survey`);
+            const errorMsg = err.response?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} survey`;
+            addToast(errorMsg, 'error');
+            setError(errorMsg);
         } finally {
             setSubmitting(false);
         }
@@ -386,271 +644,300 @@ const CreateSurveyPage = () => {
     }
 
     return (
-        <div className="container mt-4" style={{ maxWidth: '980px' }}>
-            <Link to="/admin/surveys" style={{ color: '#003594', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                <FaArrowLeft size={12} aria-hidden="true" />
-                Back to Manage Surveys and Feedbacks
-            </Link>
+        <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+                <Link to="/admin/surveys" className="text-sm font-medium text-slate-600 transition-all duration-200 hover:text-slate-900">
+                    Back to Manage Surveys
+                </Link>
+                {autosaving && <span className="text-xs text-slate-500">Saving draft...</span>}
+            </div>
 
-            <div className="card mt-3">
-                <div className="card-body">
-                    <h1 style={{ marginBottom: '8px' }}>{isEditMode ? 'Update Survey' : 'Create Survey'}</h1>
-                    <p style={{ color: '#666', marginTop: 0 }}>
-                        {isEditMode
-                            ? 'Edit title, description, questions, and options in one place, then update at the bottom.'
-                            : 'Build the full survey now: title, description, questions, and options.'}
-                    </p>
+            <Card>
+                <CardHeader className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <h1 className="text-2xl font-semibold text-slate-900">{isEditMode ? 'Update Survey' : 'Create Survey'}</h1>
+                        <p className="mt-1 text-sm text-slate-500">
+                            {isEditMode ? 'Edit survey details, questions, and settings.' : 'Build your survey with questions and settings.'}
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button type="button" variant="outline" onClick={() => setPreviewMode(!previewMode)}>
+                            {previewMode ? 'Edit Mode' : 'Preview'}
+                        </Button>
+                        <Button type="button" variant="outline" onClick={() => setShowSettings(!showSettings)}>
+                            {showSettings ? 'Hide Settings' : 'Show Settings'}
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardBody>
+                    {error && <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
+                    {success && <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{success}</div>}
 
-                    {error && <div className="alert alert-danger">{error}</div>}
-                    {success && <div className="alert alert-success">{success}</div>}
-
-                    <form
-                        onSubmit={handleSubmit}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
-                                e.preventDefault();
-                            }
-                        }}
-                    >
-                        <div className="form-group">
-                            <label>Survey Title *</label>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                placeholder="Enter survey title"
-                                required
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Description</label>
-                            <textarea
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                placeholder="Describe what this survey is about"
-                                rows="4"
-                            />
-                        </div>
-
-                        <div style={{ marginTop: '20px', border: '1px solid #dbe4f2', borderRadius: '8px', padding: '16px', backgroundColor: '#f9fbff' }}>
-                            <h3 style={{ margin: '0 0 10px 0', color: '#003594' }}>Submission Email</h3>
-                            <p style={{ marginTop: 0, color: '#5a6f95', fontSize: '0.9rem' }}>
-                                A confirmation email is automatically sent when a user submits this survey.
-                                Leave fields blank to use the default generic email.
-                                You can use tokens: {'{{user_name}}'}, {'{{survey_title}}'}, {'{{submitted_at}}'}.
-                            </p>
-
-                            <div className="form-group">
-                                <label>Custom Email Subject (Optional)</label>
-                                <input
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-4">
+                            <h2 className="text-base font-semibold text-slate-900">Basic Information</h2>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">Survey Title</label>
+                                <Input
                                     type="text"
-                                    value={submissionEmailSubject}
-                                    onChange={(e) => setSubmissionEmailSubject(e.target.value)}
-                                    placeholder="Thanks for submitting {{survey_title}}"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="Enter survey title"
+                                    required
                                     maxLength={255}
                                 />
                             </div>
-
-                            <div className="form-group">
-                                <label>Custom Email Body (Optional)</label>
-                                <textarea
-                                    value={submissionEmailBody}
-                                    onChange={(e) => setSubmissionEmailBody(e.target.value)}
-                                    placeholder="Hello {{user_name}}, thank you for completing {{survey_title}}."
-                                    rows="5"
-                                    maxLength={10000}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">Description</label>
+                                <Textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    placeholder="Describe what this survey is about"
+                                    rows={3}
                                 />
                             </div>
+                        </div>
 
-                            <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label>Add Email Attachments (Optional)</label>
-                                <input
-                                    type="file"
-                                    multiple
-                                    onChange={handleAttachmentFilesSelected}
-                                    disabled={uploadingAttachments}
-                                />
-                                <p style={{ margin: '6px 0 0 0', color: '#5a6f95', fontSize: '0.85rem' }}>
-                                    You can attach files that will be included in each submission confirmation email.
-                                </p>
+                        {!previewMode && (
+                            <>
+                                <Card>
+                                    <CardHeader>
+                                        <h2 className="text-base font-semibold text-slate-900">Submission Email</h2>
+                                    </CardHeader>
+                                    <CardBody className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700">Custom Email Subject (Optional)</label>
+                                            <Input
+                                                type="text"
+                                                value={submissionEmailSubject}
+                                                onChange={(e) => setSubmissionEmailSubject(e.target.value)}
+                                                placeholder="Thanks for submitting {{survey_title}}"
+                                                maxLength={255}
+                                            />
+                                        </div>
 
-                                {uploadingAttachments && (
-                                    <p style={{ margin: '8px 0 0 0', color: '#003594', fontSize: '0.9rem' }}>
-                                        Uploading attachments...
-                                    </p>
-                                )}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700">Custom Email Body (Optional)</label>
+                                            <Textarea
+                                                value={submissionEmailBody}
+                                                onChange={(e) => setSubmissionEmailBody(e.target.value)}
+                                                placeholder="Hello {{user_name}}, thank you for completing {{survey_title}}."
+                                                rows={5}
+                                                maxLength={10000}
+                                            />
+                                        </div>
 
-                                {submissionEmailAttachments.length > 0 && (
-                                    <div style={{ marginTop: '10px' }}>
-                                        {submissionEmailAttachments.map((attachment, index) => (
-                                            <div
-                                                key={`${attachment.name}-${index}`}
-                                                style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'center', marginBottom: '6px', backgroundColor: '#fff', padding: '8px 10px', borderRadius: '6px', border: '1px solid #e4e9f5' }}
-                                            >
-                                                <span style={{ fontSize: '0.9rem', color: '#2b2b2b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
-                                                    {attachment.name}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger"
-                                                    style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                                                    onClick={() => removeAttachment(index)}
-                                                >
-                                                    Remove
-                                                </button>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700">Add Email Attachments (Optional)</label>
+                                            <Input type="file" multiple onChange={handleAttachmentFilesSelected} disabled={uploadingAttachments} />
+                                            {uploadingAttachments && <p className="text-xs text-slate-500">Uploading attachments...</p>}
+                                            {submissionEmailAttachments.length > 0 && (
+                                                <div className="space-y-2 pt-2">
+                                                    {submissionEmailAttachments.map((attachment, index) => (
+                                                        <div key={`${attachment.name}-${index}`} className="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                                                            <span className="truncate text-sm text-slate-700">{attachment.name}</span>
+                                                            <Button type="button" variant="danger" size="sm" onClick={() => removeAttachment(index)}>Remove</Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </CardBody>
+                                </Card>
+
+                                {showSettings && <SurveySettingsPanel settings={surveySettings} onChange={setSurveySettings} />}
+
+                                <Card>
+                                    <CardHeader className="flex items-center justify-between">
+                                        <h2 className="text-base font-semibold text-slate-900">Questions ({questions.length})</h2>
+                                        <Button type="button" onClick={addQuestion}>Add Question</Button>
+                                    </CardHeader>
+                                    <CardBody className="space-y-3">
+                                        {questions.length === 0 && (
+                                            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm text-slate-600">
+                                                No questions yet. Add at least one question to complete the survey.
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-3">
+                                            {questions.map((question, index) => (
+                                                <QuestionCard
+                                                    key={question.localId}
+                                                    question={question}
+                                                    index={index}
+                                                    totalQuestions={questions.length}
+                                                    isEditing={editingQuestionIndex === index}
+                                                    isDragging={draggedQuestion === index}
+                                                    onDragStart={() => handleDragStart(index)}
+                                                    onDragEnd={handleDragEnd}
+                                                    onEdit={() => setEditingQuestionIndex(editingQuestionIndex === index ? null : index)}
+                                                    onDelete={() => removeQuestion(question.localId)}
+                                                    onDuplicate={() => duplicateQuestion(index)}
+                                                    onMove={handleQuestionMove}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        {editingQuestionIndex !== null && (
+                                            <QuestionEditor
+                                                question={questions[editingQuestionIndex]}
+                                                index={editingQuestionIndex}
+                                                onUpdate={(updater) => updateQuestion(questions[editingQuestionIndex].localId, updater)}
+                                                onAddOption={() => addOption(questions[editingQuestionIndex].localId)}
+                                                onUpdateOption={(optionLocalId, text) => updateOption(questions[editingQuestionIndex].localId, optionLocalId, text)}
+                                                onRemoveOption={(optionLocalId) => removeOption(questions[editingQuestionIndex].localId, optionLocalId)}
+                                                onClose={() => setEditingQuestionIndex(null)}
+                                            />
+                                        )}
+                                    </CardBody>
+                                </Card>
+                            </>
+                        )}
+
+                        {previewMode && (
+                            <Card>
+                                <CardHeader>
+                                    <h2 className="text-base font-semibold text-slate-900">Preview</h2>
+                                </CardHeader>
+                                <CardBody className="space-y-3">
+                                    <h3 className="text-lg font-semibold text-slate-900">{title || 'Untitled Survey'}</h3>
+                                    {description ? <p className="text-sm text-slate-600">{description}</p> : null}
+                                    <p className="text-sm text-slate-500">{questions.length} question{questions.length === 1 ? '' : 's'}</p>
+
+                                    <div className="space-y-3">
+                                        {questions.map((question, index) => (
+                                            <div key={question.localId} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                                                <p className="mb-2 text-sm font-semibold text-slate-800">{index + 1}. {question.question_text || '(No question text)'}</p>
+                                                {question.help_text ? <p className="mb-2 text-sm text-slate-500">{question.help_text}</p> : null}
+                                                {OPTION_BASED_TYPES.has(question.question_type) && (question.options || []).length > 0 ? (
+                                                    <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
+                                                        {(question.options || []).map((option) => (
+                                                            <li key={option.localId || option.id}>{option.option_text || '(Empty option)'}</li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-sm text-slate-500">{question.question_type.replace('_', ' ')} response</p>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div style={{ marginTop: '28px', marginBottom: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h2 style={{ margin: 0 }}>Questions</h2>
-                            <button
-                                type="button"
-                                className="btn btn-success"
-                                onClick={addQuestion}
-                            >
-                                + Add Question
-                            </button>
-                        </div>
-
-                        {questions.length === 0 && (
-                            <div
-                                style={{
-                                    padding: '18px',
-                                    border: '1px dashed #b7c7e6',
-                                    borderRadius: '8px',
-                                    color: '#4a5b7a',
-                                    marginBottom: '18px',
-                                    backgroundColor: '#f7faff',
-                                }}
-                            >
-                                No questions yet. Add at least one question to complete the survey.
-                            </div>
+                                </CardBody>
+                            </Card>
                         )}
 
-                        {questions.map((question, index) => {
-                            const usesOptions = OPTION_BASED_TYPES.has(question.question_type);
-                            return (
-                                <div
-                                    key={question.localId}
-                                    style={{
-                                        border: '1px solid #dbe4f2',
-                                        borderRadius: '8px',
-                                        padding: '16px',
-                                        marginBottom: '14px',
-                                        backgroundColor: '#fff',
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-                                        <strong style={{ color: '#003594' }}>Question {index + 1}</strong>
-                                        <button
-                                            type="button"
-                                            className="btn btn-danger"
-                                            style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                                            onClick={() => removeQuestion(question.localId)}
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label>Question Text *</label>
-                                        <textarea
-                                            value={question.question_text}
-                                            onChange={(e) => updateQuestion(question.localId, { question_text: e.target.value })}
-                                            placeholder="Enter your question"
-                                            rows="2"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'end' }}>
-                                        <div className="form-group" style={{ marginBottom: 0 }}>
-                                            <label>Question Type</label>
-                                            <select
-                                                value={question.question_type}
-                                                onChange={(e) => updateQuestion(question.localId, { question_type: e.target.value })}
-                                            >
-                                                {QUESTION_TYPES.map((item) => (
-                                                    <option key={item.value} value={item.value}>{item.label}</option>
-                                                ))}
-                                            </select>
-                                            <p style={{ margin: '6px 0 0 0', fontSize: '0.85rem', color: '#5a6f95' }}>
-                                                {QUESTION_TYPE_HINTS[question.question_type]}
-                                            </p>
-                                        </div>
-
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={question.is_required}
-                                                onChange={(e) => updateQuestion(question.localId, { is_required: e.target.checked })}
-                                            />
-                                            Required
-                                        </label>
-                                    </div>
-
-                                    {usesOptions && (
-                                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #edf1f7' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                                <strong>Options</strong>
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-secondary"
-                                                    style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                                                    onClick={() => addOption(question.localId)}
-                                                >
-                                                    + Add Option
-                                                </button>
-                                            </div>
-
-                                            {(question.options || []).length === 0 && (
-                                                <p style={{ color: '#666', margin: 0, fontSize: '0.9rem' }}>
-                                                    Add at least 2 options for this question type.
-                                                </p>
-                                            )}
-
-                                            {(question.options || []).map((option, optionIndex) => (
-                                                <div key={option.localId} style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-                                                    <span style={{ width: '24px', color: '#6d7ea3', fontSize: '0.85rem' }}>{optionIndex + 1}.</span>
-                                                    <input
-                                                        type="text"
-                                                        value={option.option_text}
-                                                        onChange={(e) => updateOption(question.localId, option.localId, e.target.value)}
-                                                        placeholder="Option text"
-                                                        style={{ flex: 1 }}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-danger"
-                                                        style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                                                        onClick={() => removeOption(question.localId, option.localId)}
-                                                    >
-                                                        Remove
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-
-                        <button
-                            type="submit"
-                            className="btn btn-primary btn-block"
-                            disabled={!canSubmit}
-                            style={{ marginTop: '20px', width: '100%', padding: '12px 16px', fontWeight: 700 }}
-                        >
-                            {submitting
-                                ? (isEditMode ? 'Updating Survey...' : 'Creating Survey...')
-                                : (isEditMode ? 'Update Survey' : 'Create Survey')}
-                        </button>
+                        <div className="flex justify-end">
+                            <Button type="submit" disabled={!canSubmit}>{submitting ? 'Saving...' : isEditMode ? 'Update Survey' : 'Create Survey'}</Button>
+                        </div>
                     </form>
+                </CardBody>
+            </Card>
+        </div>
+    );
+};
+
+// Question Editor Component
+const QuestionEditor = ({
+    question,
+    index,
+    onUpdate,
+    onAddOption,
+    onUpdateOption,
+    onRemoveOption,
+    onClose,
+}) => {
+    const usesOptions = OPTION_BASED_TYPES.has(question.question_type);
+
+    return (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-900/40 px-4 py-6">
+            <div className="w-full max-w-2xl rounded-lg border border-slate-200 bg-white shadow-md">
+                <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                    <h3 className="text-base font-semibold text-slate-900">Question {index + 1}</h3>
+                    <Button type="button" variant="outline" size="sm" onClick={onClose}>Close</Button>
+                </div>
+
+                <div className="space-y-4 px-5 py-4">
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">Question Text</label>
+                        <Textarea
+                            value={question.question_text}
+                            onChange={(e) => onUpdate({ question_text: e.target.value })}
+                            placeholder="Enter your question"
+                            rows={2}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">Description (optional)</label>
+                        <Textarea
+                            value={question.description || ''}
+                            onChange={(e) => onUpdate({ description: e.target.value })}
+                            placeholder="Additional context or example"
+                            rows={2}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">Help Text (optional)</label>
+                        <Input
+                            type="text"
+                            value={question.help_text || ''}
+                            onChange={(e) => onUpdate({ help_text: e.target.value })}
+                            placeholder="Hint shown to respondents"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-end">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-700">Question Type</label>
+                            <select
+                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                                value={question.question_type}
+                                onChange={(e) => onUpdate({ question_type: e.target.value })}
+                            >
+                                {QUESTION_TYPES.map((type) => (
+                                    <option key={type.value} value={type.value}>{type.label}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                            <input
+                                type="checkbox"
+                                className="h-4 w-4 rounded border-slate-300 text-slate-700 focus:ring-slate-300"
+                                checked={question.is_required}
+                                onChange={(e) => onUpdate({ is_required: e.target.checked })}
+                            />
+                            Required
+                        </label>
+                    </div>
+
+                    {usesOptions && (
+                        <div className="space-y-3 rounded-lg border border-slate-200 p-3">
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-sm font-semibold text-slate-800">Options ({question.options?.length || 0})</h4>
+                                <Button type="button" variant="outline" size="sm" onClick={onAddOption}>Add Option</Button>
+                            </div>
+
+                            <div className="space-y-2">
+                                {question.options?.map((option, optIndex) => (
+                                    <div key={option.localId} className="flex items-center gap-2">
+                                        <span className="w-6 text-sm text-slate-500">{optIndex + 1}</span>
+                                        <Input
+                                            type="text"
+                                            value={option.option_text}
+                                            onChange={(e) => onUpdateOption(option.localId, e.target.value)}
+                                            placeholder={`Option ${optIndex + 1}`}
+                                        />
+                                        <Button type="button" variant="danger" size="sm" onClick={() => onRemoveOption(option.localId)}>Remove</Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex justify-end">
+                        <Button type="button" variant="outline" onClick={onClose}>Done</Button>
+                    </div>
                 </div>
             </div>
         </div>

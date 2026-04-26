@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import articleService from '../services/articleService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
+import SeoMeta from '../components/SeoMeta';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const API_ORIGIN = API_BASE.replace(/\/api\/?$/, '');
@@ -44,8 +45,14 @@ const normalizeArticleContent = (html) => {
     return container.innerHTML;
 };
 
+const plainText = (value) => {
+    const container = document.createElement('div');
+    container.innerHTML = value || '';
+    return (container.textContent || '').trim();
+};
+
 const ArticleDetailPage = () => {
-    const { id } = useParams();
+    const { slug } = useParams();
     const [article, setArticle] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -53,7 +60,7 @@ const ArticleDetailPage = () => {
     const fetchArticle = useCallback(async () => {
         try {
             setLoading(true);
-            const response = await articleService.getArticleById(id);
+            const response = await articleService.getArticleById(slug);
             setArticle(response.data.article);
             setError('');
         } catch (err) {
@@ -62,7 +69,7 @@ const ArticleDetailPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [id]);
+    }, [slug]);
 
     useEffect(() => {
         fetchArticle();
@@ -83,6 +90,13 @@ const ArticleDetailPage = () => {
 
     return (
         <div className="container mt-4">
+            <SeoMeta
+                title={`${article.title} | Survey Pro Articles`}
+                description={plainText(article.content).slice(0, 160)}
+                keywords={['article', 'survey insights', article.author_name || 'author']}
+                path={`/articles/${article.slug || slug}`}
+                type="article"
+            />
             <BackLink to="/articles" label="Back to Articles" />
 
             <article className="card mt-3" style={{ maxWidth: '800px', margin: '24px auto 0' }}>
@@ -104,6 +118,9 @@ const ArticleDetailPage = () => {
                         }}
                         dangerouslySetInnerHTML={{ __html: normalizeArticleContent(article.content) }}
                     />
+                    <p style={{ marginTop: '24px' }}>
+                        Want to apply these ideas? <Link to="/surveys">Take a survey</Link>.
+                    </p>
                 </div>
             </article>
         </div>

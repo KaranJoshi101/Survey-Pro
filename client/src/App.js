@@ -1,41 +1,41 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import './index.css';
-
-// Pages
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import SurveysPage from './pages/SurveysPage';
-import SurveyDetailPage from './pages/SurveyDetailPage';
-import TakeSurveyPage from './pages/TakeSurveyPage';
-import ResponsesPage from './pages/ResponsesPage';
-import ResponseDetailPage from './pages/ResponseDetailPage';
-import ArticlesPage from './pages/ArticlesPage';
-import ArticleDetailPage from './pages/ArticleDetailPage';
-import TrainingPage from './pages/TrainingPage';
-import ConsultingPage from './pages/ConsultingPage';
-import ConsultingDetailPage from './pages/ConsultingDetailPage';
-import ProfilePage from './pages/ProfilePage';
-import MediaPage from './pages/MediaPage';
-import MediaDetailPage from './pages/MediaDetailPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import AdminArticlesPage from './pages/AdminArticlesPage';
-import AdminResponsesPage from './pages/AdminResponsesPage';
-import AdminUsersPage from './pages/AdminUsersPage';
-import AdminSurveysPage from './pages/AdminSurveysPage';
-import AdminTrainingPage from './pages/AdminTrainingPage';
-import AdminMediaPage from './pages/AdminMediaPage';
-import AdminConsultingPage from './pages/AdminConsultingPage';
-import AdminConsultingAnalyticsPage from './pages/AdminConsultingAnalyticsPage';
-// import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
-import CreateSurveyPage from './pages/CreateSurveyPage';
-import SurveyAnalyticsPage from './pages/SurveyAnalyticsPage';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoadingSpinner from './components/LoadingSpinner';
+import './index.css';
+
+// Pages
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const SurveysPage = lazy(() => import('./pages/SurveysPage'));
+const SurveyDetailPage = lazy(() => import('./pages/SurveyDetailPage'));
+const TakeSurveyPage = lazy(() => import('./pages/TakeSurveyPage'));
+const ResponsesPage = lazy(() => import('./pages/ResponsesPage'));
+const ResponseDetailPage = lazy(() => import('./pages/ResponseDetailPage'));
+const ArticlesPage = lazy(() => import('./pages/ArticlesPage'));
+const ArticleDetailPage = lazy(() => import('./pages/ArticleDetailPage'));
+const TrainingPage = lazy(() => import('./pages/TrainingPage'));
+const ConsultingPage = lazy(() => import('./pages/ConsultingPage'));
+const ConsultingDetailPage = lazy(() => import('./pages/ConsultingDetailPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const MediaPage = lazy(() => import('./pages/MediaPage'));
+const MediaDetailPage = lazy(() => import('./pages/MediaDetailPage'));
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'));
+const AdminArticlesPage = lazy(() => import('./pages/AdminArticlesPage'));
+const AdminResponsesPage = lazy(() => import('./pages/AdminResponsesPage'));
+const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
+const AdminSurveysPage = lazy(() => import('./pages/AdminSurveysPage'));
+const AdminTrainingPage = lazy(() => import('./pages/AdminTrainingPage'));
+const AdminMediaPage = lazy(() => import('./pages/AdminMediaPage'));
+const AdminConsultingPage = lazy(() => import('./pages/AdminConsultingPage'));
+const AdminConsultingAnalyticsPage = lazy(() => import('./pages/AdminConsultingAnalyticsPage'));
+// import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
+const CreateSurveyPage = lazy(() => import('./pages/CreateSurveyPage'));
+const SurveyAnalyticsPage = lazy(() => import('./pages/SurveyAnalyticsPage'));
 // import analyticsService from './services/analyticsService';
 
 const AppContent = () => {
@@ -79,18 +79,21 @@ const AppContent = () => {
         <>
             <Navbar />
             <main style={{ minHeight: 'calc(100vh - 60px)', paddingBottom: '32px' }}>
+                <Suspense fallback={<LoadingSpinner fullScreen={false} />}>
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/articles" element={<ArticlesPage />} />
-                    <Route path="/articles/:id" element={<ArticleDetailPage />} />
+                    <Route path="/articles/:slug" element={<ArticleDetailPage />} />
                     <Route path="/training" element={<TrainingPage />} />
+                    <Route path="/training/:category" element={<TrainingPage />} />
+                    <Route path="/training/:category/:slug" element={<TrainingPage />} />
                     <Route path="/consulting" element={<ConsultingPage />} />
                     <Route path="/consulting/:slug" element={<ConsultingDetailPage />} />
                     <Route path="/surveys" element={<SurveysPage />} />
-                    <Route path="/surveys/:id" element={<SurveyDetailPage />} />
+                    <Route path="/surveys/:slug" element={<SurveyDetailPage />} />
 
                     {/* Protected User Routes */}
                     <Route
@@ -247,6 +250,7 @@ const AppContent = () => {
                     {/* Catch all - redirect to home */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
+                </Suspense>
             </main>
         </>
     );
