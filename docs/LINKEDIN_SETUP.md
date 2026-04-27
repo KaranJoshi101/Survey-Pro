@@ -25,7 +25,7 @@ Fill in the following details:
 
 | Field | Example Value |
 |-------|---------------|
-| **App name** | SurveyPro Media Feed |
+| **App name** | InsightForge Media Feed |
 | **LinkedIn Page** | Your professional page or create new |
 | **App logo** | Your company/project logo |
 | **Legal agreement** | Check the box |
@@ -192,7 +192,7 @@ LINKEDIN_PROFILE_URN=urn:li:person:123456789
 
 Navigate to project root:
 ```bash
-cd survey-app
+cd insightforge
 ```
 
 Create or edit `.env`:
@@ -225,7 +225,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=your_password
-DB_NAME=survey_app
+DB_NAME=insightforge
 
 # ===== SERVER =====
 NODE_ENV=development
@@ -252,7 +252,7 @@ LINKEDIN_REFRESH_TOKEN=AQW...
 ### Where to Place .env
 
 ```
-survey-app/
+insightforge/
 ├── .env                    # Backend .env (server directory or root)
 ├── client/
 │   ├── .env               # Frontend .env (optional)
@@ -263,12 +263,12 @@ survey-app/
 ```
 
 **Note:** Backend server can read from either:
-1. `survey-app/.env` (root level)
-2. `survey-app/server/.env` (server specific)
+1. `insightforge/.env` (root level)
+2. `insightforge/server/.env` (server specific)
 
 Frontend reads from:
-1. `survey-app/client/.env` (committed defaults)
-2. `survey-app/client/.env.local` (git-ignored local overrides)
+1. `insightforge/client/.env` (committed defaults)
+2. `insightforge/client/.env.local` (git-ignored local overrides)
 
 ---
 

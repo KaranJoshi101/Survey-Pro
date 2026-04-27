@@ -93,8 +93,8 @@ const SurveyDetailPage = () => {
     return (
         <div className="container mt-4">
             <SeoMeta
-                title={`${survey.title} | Survey Pro`}
-                description={survey.description || 'Take this survey on Survey Pro and share your responses.'}
+                title={`${survey.title} | InsightForge`}
+                description={survey.description || 'Take this survey on InsightForge and share your responses.'}
                 keywords={['survey', 'feedback', survey.title]}
                 path={`/surveys/${survey.slug || slug}`}
             />

@@ -1,4 +1,4 @@
-# Setup Guide - Survey Application
+# Setup Guide - InsightForge
 
 Follow these steps to run the app locally with the current MySQL-based backend.
 
@@ -39,7 +39,7 @@ Create or update `.env` in the project root with MySQL values:
 ```env
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=survey_app
+DB_NAME=insightforge
 DB_USER=root
 DB_PASSWORD=your_password
 DB_SSL=false
@@ -138,7 +138,7 @@ Error: `Access denied for user ...`
 - Wrong credentials in `.env`.
 - Update `DB_USER` and `DB_PASSWORD`.
 
-Error: `ER_BAD_DB_ERROR: Unknown database 'survey_app'`
+Error: `ER_BAD_DB_ERROR: Unknown database 'insightforge'`
 - Init did not run successfully.
 - Re-run `npm run db:init`.
 

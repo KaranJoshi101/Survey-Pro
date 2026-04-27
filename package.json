@@ -1,7 +1,7 @@
 {
-  "name": "survey-app",
+  "name": "insightforge",
   "version": "1.0.0",
-  "description": "Survey Application - PERN Stack",
+  "description": "InsightForge - PERN Stack",
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm start\"",
@@ -12,8 +12,8 @@
     "start": "cd server && npm start",
     "start:server": "cd server && npm start",
     "pm2:start": "pm2 start ecosystem.config.js --env production",
-    "pm2:restart": "pm2 restart survey-app-api --update-env",
-    "pm2:stop": "pm2 stop survey-app-api",
+    "pm2:restart": "pm2 restart insightforge-api --update-env",
+    "pm2:stop": "pm2 stop insightforge-api",
     "db:init": "cd server && npm run db:init",
     "db:sync:prod": "powershell -ExecutionPolicy Bypass -File ./scripts/db-sync-local-to-production.ps1",
     "seed:consulting": "node server/scripts/seed_consulting_requests_and_events.js",

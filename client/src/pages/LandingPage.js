@@ -91,8 +91,8 @@ const LandingPage = () => {
     return (
         <div className="academic-landing">
             <SeoMeta
-                title="Survey Pro | Surveys, Training, Articles, and Media"
-                description="Survey Pro is a PERN platform for research surveys, training content, publication-style articles, and media updates."
+                title="InsightForge | Surveys, Training, Articles, and Media"
+                description="InsightForge is a PERN platform for research surveys, training content, publication-style articles, and media updates."
                 keywords={['survey platform', 'training', 'articles', 'research', 'PERN app']}
                 path="/"
             />
@@ -104,7 +104,7 @@ const LandingPage = () => {
                     onClick={() => scrollToSection('hero')}
                     style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                 >
-                    Survey<span className="brand-accent">Pro</span>
+                    Insight<span className="brand-accent">Forge</span>
                 </button>
 
                 <ul className={`acad-navbar-links ${mobileMenuOpen ? 'open' : ''}`}>
@@ -351,11 +351,11 @@ const LandingPage = () => {
                                 <div className="contact-text">
                                     <h3>Email</h3>
                                     <p>
-                                        <a href="mailto:contact.primary@example.test">contact.primary@example.test</a>
+                                        <a href="mailto:manojdiwakarstat@gmail.com">manojdiwakarstat@gmail.com</a>
                                         <br />
-                                        <a href="mailto:contact.secondary@example.test">contact.secondary@example.test</a>
+                                        <a href="mailto:manojkumar@jnu.ac.in">manojkumar@jnu.ac.in</a>
                                         <br />
-                                        <a href="mailto:contact.tertiary@example.test">contact.tertiary@example.test</a>
+                                        <a href="mailto:mak851@pitt.edu">mak851@pitt.edu</a>
                                     </p>
                                 </div>
                             </div>
@@ -363,9 +363,12 @@ const LandingPage = () => {
                                 <div className="contact-icon"><FaUniversity aria-hidden="true" /></div>
                                 <div className="contact-text">
                                     <h3>Current Position</h3>
-                                    <p>Postdoctoral Associate (Biostatistics and Health Economics)<br />
-                                        McGowan Institute for Regenerative Medicine<br />
-                                        Department of Surgery<br />
+                                    <p>Assistant Professor<br />
+                                        Centre for Economic Studies and Planning<br />
+                                        Jawaharlal Nehru University, New Delhi, India<br />
+                                        <br />
+                                        Postdoctoral Associate (Biostatistics and Health Economics)<br />
+                                        McGowan Institute for Regenerative Medicine, Department of Surgery<br />
                                         University of Pittsburgh, PA, USA
                                     </p>
                                 </div>
@@ -374,8 +377,8 @@ const LandingPage = () => {
                                 <div className="contact-icon"><FaMapMarkerAlt aria-hidden="true" /></div>
                                 <div className="contact-text">
                                     <h3>Address</h3>
-                                    <p>123 Research Avenue<br />
-                                        Example City, EX 12345, USA
+                                    <p>777 Hazelwood Ave<br />
+                                        Pittsburgh, PA 15217, USA
                                     </p>
                                 </div>
                             </div>
@@ -383,7 +386,7 @@ const LandingPage = () => {
                                 <div className="contact-icon"><FaPhoneAlt aria-hidden="true" /></div>
                                 <div className="contact-text">
                                     <h3>Phone</h3>
-                                    <p>+1 555-0100
+                                    <p>+1 412-589-8944
                                     </p>
                                 </div>
                             </div>
@@ -392,7 +395,7 @@ const LandingPage = () => {
                         <div className="acad-contact-links">
                             <h2>Professional Profiles</h2>
                             <a
-                                href="https://www.linkedin.com/in/example-research-profile/"
+                                href="https://www.linkedin.com/in/drmanojkumardiwakarstatisticianprofessoratjnu/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="acad-link-btn"
@@ -401,7 +404,7 @@ const LandingPage = () => {
                                 LinkedIn
                             </a>
                             <a
-                                href="https://orcid.org/0000-0000-0000-0000"
+                                href="https://orcid.org/0000-0001-6444-8160"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="acad-link-btn"
@@ -442,7 +445,7 @@ const LandingPage = () => {
                         <div>
                             <h4>Contact</h4>
                             <ul className="acad-footer-links">
-                                <li><a href="mailto:contact@example.test">contact@example.test</a></li>
+                                <li><a href="mailto:manojdiwakarstat@gmail.com">manojdiwakarstat@gmail.com</a></li>
                                 {/* <li><button type="button" onClick={() => scrollToSection('media')}>Media &amp; Talks</button></li> */}
                                 <li><button type="button" onClick={() => scrollToSection('contact')}>Contact Info</button></li>
                                 <li><Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>Login</Link></li>
@@ -450,7 +453,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                     <div className="acad-footer-bottom">
-                        <p>&copy; {new Date().getFullYear()} Survey Pro &mdash; Academic Research Platform. All rights reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} InsightForge &mdash; Academic Research Platform. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

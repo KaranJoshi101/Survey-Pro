@@ -2,13 +2,13 @@
 
 ## Overview
 
-A beautiful, professional landing page has been added to the Survey Application. It serves as the home page for all visitors (logged out users) and showcases the platform's features, team information, and available content.
+A beautiful, professional landing page has been added to the InsightForge. It serves as the home page for all visitors (logged out users) and showcases the platform's features, team information, and available content.
 
 ## Features
 
 ### 1. Navigation Bar
 - **Sticky Navigation** - Stays at top while scrolling
-- **Logo & Branding** - "Survey Pro" with icon
+- **Logo & Branding** - "InsightForge" with icon
 - **Navigation Links** - Surveys, Articles, About sections
 - **Auth Buttons** - Login and Sign Up links
 - **Responsive Design** - Works on all devices
@@ -266,7 +266,7 @@ All sections use `auto-fit` grid with minimum column width for automatic respons
 ## File Location
 
 ```
-/d/softee/survey-app/client/src/pages/LandingPage.js
+/d/softee/insightforge/client/src/pages/LandingPage.js
 ```
 
 ---

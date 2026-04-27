@@ -1,4 +1,4 @@
-# Survey App Master Diagram Specification
+# InsightForge Master Diagram Specification
 
 Version: 1.0  
 Date: 2026-03-23  
@@ -22,7 +22,7 @@ Use this file to generate professional diagrams in Mermaid, Draw.io, Lucidchart,
 
 ## 2. Project Summary
 
-Product name: Survey App  
+Product name: InsightForge  
 Stack: MySQL, Express, React, Node.js  
 Primary goals:
 - Collect survey responses from users
@@ -157,7 +157,7 @@ External entities:
 - E2 Admin
 
 Core process:
-- P0 Survey App System
+- P0 InsightForge System
 
 Data stores:
 - D0 MySQL

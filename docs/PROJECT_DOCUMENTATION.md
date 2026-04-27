@@ -1,11 +1,11 @@
-# Survey App - Complete Project Documentation
+# InsightForge - Complete Project Documentation
 
-Version: 1.3
-Last Updated: 2026-04-26 (MySQL migration and consistency sync)
+Version: 1.4
+Last Updated: 2026-04-27 (documentation consolidation and runtime defaults sync)
 
 ## 1. Project Overview
 
-Survey App is a full-stack platform for creating surveys, collecting responses, publishing articles/media/training content, offering consulting services with lead capture, and managing users through an admin dashboard.
+InsightForge is a full-stack platform for creating surveys, collecting responses, publishing articles/media/training content, offering consulting services with lead capture, and managing users through an admin dashboard.
 
 ### Primary Goals
 - Support secure registration/login with role-based access.
@@ -24,7 +24,7 @@ Survey App is a full-stack platform for creating surveys, collecting responses, 
 ## 2. Repository Structure
 
 ```text
-survey-app/
+insightforge/
   client/                  React frontend (CRA + CRACO)
   server/                  Express API and uploads
   database/                DB scripts/migrations/seeds
@@ -33,20 +33,20 @@ survey-app/
   backups/                 DB backup artifacts
   logs/                    Runtime logs
   ecosystem.config.js      PM2 config
-  DEPLOYMENT.md            Production deployment runbook
-  QUICK_START.md           Quick-start guide
+  docs/DEPLOYMENT.md       Production deployment runbook
+  docs/QUICK_START.md      Quick-start guide
 ```
 
 ## 3. Runtime Architecture
 
 ### Ports and URL Defaults
 - Frontend: 3000
-- Backend API: 5000
+- Backend API: 5002 (current local default via .env)
 - API base path: /api
 - Health: /api/health
 - DB health: /api/health/db
-- Frontend dev proxy default: http://localhost:5000 (from client/package.json `proxy`)
-- Frontend explicit API base (when configured): REACT_APP_API_URL (for example http://localhost:5000/api)
+- Frontend dev proxy default: http://localhost:5002 (from client/package.json `proxy`)
+- Frontend explicit API base (when configured): REACT_APP_API_URL (for example http://localhost:5002/api)
 
 ### Backend Route Mounts
 - /api/auth
@@ -339,13 +339,13 @@ Primary references in docs/:
 - LINKEDIN_SETUP.md: LinkedIn integration setup
 - STEP2_BACKEND_SETUP.md and STEP3_FRONTEND_DEVELOPMENT.md: Build-out references
 - LANDING_PAGE.md and LANDING_PAGE_SUMMARY.md: Landing page design and implementation notes
+- QUICK_START.md, SETUP.md, DEPLOYMENT.md: consolidated operational guides
 
 Root references:
 - README.md: Quick onboarding summary
-- QUICK_START.md: Fast local startup checklist
-- SETUP.md: Detailed local setup
-- DEPLOYMENT.md: Production deployment runbook
-- IMPLEMENTATION_STATUS.md: Build progress tracking
+- docs/QUICK_START.md: Fast local startup checklist
+- docs/SETUP.md: Detailed local setup
+- docs/DEPLOYMENT.md: Production deployment runbook
 
 ## 12. Current Status Snapshot
 

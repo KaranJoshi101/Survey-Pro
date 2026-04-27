@@ -14,7 +14,7 @@ const SeoMeta = ({
     noIndex = false,
 }) => {
     const canonical = `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
-    const finalDescription = description || 'Survey Pro platform for surveys, articles, training, and media.';
+    const finalDescription = description || 'InsightForge platform for surveys, articles, training, and media.';
     const keywordsText = Array.isArray(keywords) ? keywords.join(', ') : String(keywords || '');
     const ogImage = image || DEFAULT_IMAGE;
 

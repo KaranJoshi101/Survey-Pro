@@ -1,4 +1,4 @@
-# Survey Application - Quick Start
+# InsightForge - Quick Start
 
 ## 1. Prerequisites
 
@@ -15,7 +15,7 @@ Example:
 ```env
 DB_HOST=localhost
 DB_PORT=5433
-DB_NAME=survey_app
+DB_NAME=insightforge
 DB_USER=postgres
 DB_PASSWORD=your_postgres_password
 DB_SSL=false
@@ -186,7 +186,7 @@ Full documentation available in `/docs/`:
 
 ## Summary
 
-🎉 **Survey Application is 100% Complete!**
+🎉 **InsightForge is 100% Complete!**
 
 **Total Code Written**:
 - Backend: ~2000 lines
@@ -215,11 +215,11 @@ If you have any issues:
 **Start the application now with:**
 ```bash
 # Terminal 1 - Backend
-cd /d/softee/survey-app
+cd /d/softee/insightforge
 npm run server
 
 # Terminal 2 - Frontend (new terminal)
-cd /d/softee/survey-app/client
+cd /d/softee/insightforge/client
 npm start
 ```
 

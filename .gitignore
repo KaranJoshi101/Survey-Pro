@@ -70,3 +70,10 @@ context/
 # Windows metadata
 desktop.ini
 
+# Transient documentation artifacts
+*_ADDED.txt
+*_COMPLETE.txt
+IMPLEMENTATION_STATUS.md
+docs/*.doc
+docs/*.docx
+

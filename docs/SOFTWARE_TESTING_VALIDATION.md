@@ -1,6 +1,6 @@
 # Software Testing and Validation Report
 
-Project: Survey App (PERN Web Platform)  
+Project: InsightForge (PERN Web Platform)  
 Document Version: 1.1  
 Test Cycle: Post-Deployment Manual Validation  
 Report Date: 21 April 2026
@@ -8,7 +8,7 @@ Report Date: 21 April 2026
 ## 1. Introduction
 
 ### 1.1 Project Description
-Survey App is a full-stack PERN web platform for secure user onboarding, survey publishing and response collection, analytics visibility, content delivery (articles/media/training), consulting lead capture, and admin operations.
+InsightForge is a full-stack PERN web platform for secure user onboarding, survey publishing and response collection, analytics visibility, content delivery (articles/media/training), consulting lead capture, and admin operations.
 
 ### 1.2 Purpose of This Document
 This report provides formal evidence of manual testing and validation completed against the deployed application. It captures scope, execution method, traceability, observed outcomes, and issue status for release assurance and operational confidence.
@@ -90,7 +90,7 @@ This report provides formal evidence of manual testing and validation completed 
 | TC-CON-001 | Consulting | View consulting services list | Open consulting page | Services are listed with CTA | Services rendered with titles and summaries; CTA buttons opened corresponding service detail pages | Pass | N/A |
 | TC-CON-002 | Consulting | Submit consultation request (valid) | Open service detail; fill required fields; submit | Request is accepted with confirmation | Form submitted successfully and confirmation message displayed on same page | Pass | N/A |
 | TC-CON-003 | Validation | Submit consultation request with empty required fields | Leave name/email/message blank; submit | Validation messages are shown and submit blocked | Required fields displayed inline validation text; submission request was not sent | Pass | N/A |
-| TC-ADM-001 | Admin | Create and publish survey | Login as admin; create survey; publish | Survey appears in managed list and is publishable | New survey appeared in admin list after save and was available in user-facing survey list after publish | Pass | N/A |
+| TC-ADM-001 | Admin | Create and publish survey | Login as admin; create survey; publish | InsightForgeears in managed list and is publishable | New InsightForgeeared in admin list after save and was available in user-facing survey list after publish | Pass | N/A |
 | TC-ADM-002 | Admin UI | Analytics period selector behavior | Open admin consulting analytics; switch period filters | Active period indicator updates correctly each switch | Data refreshed by selected period, but active highlight on period chip did not update until second click in one observed run | Fail (Non-blocking) | Low |
 | TC-SEC-001 | Security | Access protected endpoint without token | Send unauthenticated request to protected API | Request is rejected | API returned unauthorized response and no protected payload was returned | Pass | N/A |
 | TC-SEC-002 | Security | Repeated invalid login attempts | Submit invalid credentials repeatedly | Security controls handle repeated attempts | Repeated attempts were restricted after consecutive failures and visible denial message was returned | Pass | N/A |
@@ -152,6 +152,6 @@ This report provides formal evidence of manual testing and validation completed 
 
 ## 12. Conclusion
 
-The deployed Survey App demonstrates stable behavior across core functional flows, role-based access control, validation handling, and primary content/consulting workflows within the defined test scope.
+The deployed InsightForge demonstrates stable behavior across core functional flows, role-based access control, validation handling, and primary content/consulting workflows within the defined test scope.
 
 Observed non-blocking issues are documented for future refinement and do not impact core system usability.

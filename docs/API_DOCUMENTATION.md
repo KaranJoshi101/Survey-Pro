@@ -1,4 +1,4 @@
-# API Documentation - Survey Application
+# API Documentation - InsightForge
 
 ## Base URL
 ```
@@ -929,7 +929,7 @@ Authorization: Bearer <admin_token>
 ## Test Users (From Seed Data)
 
 ### Admin
-- Email: `admin@surveyapp.com`
+- Email: `admin@insightforge.com`
 - Password: `admin123`
 
 ### Regular Users

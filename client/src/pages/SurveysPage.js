@@ -166,8 +166,8 @@ const SurveysPage = () => {
     return (
         <div className="container mt-4">
             <SeoMeta
-                title="Available Surveys | Survey Pro"
-                description="Explore active surveys and share your responses securely on Survey Pro."
+                title="Available Surveys | InsightForge"
+                description="Explore active surveys and share your responses securely on InsightForge."
                 keywords={['surveys', 'questionnaire', 'feedback', 'research']}
                 path="/surveys"
             />

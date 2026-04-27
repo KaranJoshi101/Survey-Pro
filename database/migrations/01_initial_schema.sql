@@ -1,5 +1,5 @@
 -- Step 1: Design Database
--- Survey Application Database Schema
+-- InsightForge Database Schema
 
 -- Create ENUM types (if not exists)
 DO $$ BEGIN

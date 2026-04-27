@@ -199,7 +199,7 @@ public/
 
 ### 1. Install Dependencies
 ```bash
-cd /d/softee/survey-app/client
+cd /d/softee/insightforge/client
 npm install
 ```
 
@@ -214,7 +214,7 @@ Opens at: http://localhost:3000
 The backend server should be running on port 5001:
 ```bash
 # In another terminal
-cd /d/softee/survey-app
+cd /d/softee/insightforge
 npm run server
 ```
 
@@ -224,7 +224,7 @@ npm run server
 
 ### Demo Credentials
 ```
-Admin:  admin@surveyapp.com / admin123
+Admin:  admin@insightforge.com / admin123
 User:   john@example.com / admin123
 ```
 
@@ -290,7 +290,7 @@ Token-based authentication with auto-redirect
 
 ## Summary
 
-🎉 **The complete Survey Application is now fully functional!**
+🎉 **The complete InsightForge is now fully functional!**
 
 **Backend (Step 2)**: Express.js API with 28 endpoints ✅
 **Frontend (Step 3)**: React app with 11 pages + components ✅

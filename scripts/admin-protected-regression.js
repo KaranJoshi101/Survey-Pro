@@ -56,7 +56,7 @@ const buildEndpoints = (surveyId) => {
       console.log('info no-survey-found: skipping responses/survey/:id check');
     }
   } catch (_err) {
-    console.log('info survey-probe-failed: skipping responses/survey/:id check');
+    console.log('info insightforge-probe-failed: skipping responses/survey/:id check');
   }
 
   const endpoints = buildEndpoints(surveyId);

@@ -2,14 +2,14 @@
 
 ## Summary
 
-A **beautiful, professional landing page** has been created for the Survey Application. It serves as the public-facing homepage and showcases the platform's features, team information, and available content.
+A **beautiful, professional landing page** has been created for the InsightForge. It serves as the public-facing homepage and showcases the platform's features, team information, and available content.
 
 ---
 
 ## 🎯 Landing Page Sections
 
 ### 1. **Sticky Navigation Bar**
-- Logo: "📋 Survey Pro"
+- Logo: "📋 InsightForge"
 - Navigation links: Surveys, Articles, About
 - Auth buttons: Login & Sign Up
 - Professional styling with hover effects
@@ -29,7 +29,7 @@ Highlights 3 key features:
 ### 4. **Team/Admin Info Section**
 Three informational cards:
 - **Admin User Profile**
-  - Email: admin@surveyapp.com
+  - Email: admin@insightforge.com
   - Features list:
     - Create & manage surveys
     - View response analytics
@@ -332,13 +332,13 @@ All grid layouts use `auto-fit` for automatic responsiveness.
 
 ### Start Backend Server (if not running)
 ```bash
-cd /d/softee/survey-app
+cd /d/softee/insightforge
 npm run server
 ```
 
 ### Start Frontend
 ```bash
-cd /d/softee/survey-app/client
+cd /d/softee/insightforge/client
 npm start
 ```
 
@@ -351,14 +351,14 @@ Open browser: **http://localhost:3000**
 
 Complete landing page documentation available at:
 ```
-/d/softee/survey-app/docs/LANDING_PAGE.md
+/d/softee/insightforge/docs/LANDING_PAGE.md
 ```
 
 ---
 
 ## 🎉 Summary
 
-Your Survey Application now has a **professional, feature-rich landing page** that:
+Your InsightForge now has a **professional, feature-rich landing page** that:
 
 1. ✅ Showcases platform features
 2. ✅ Displays admin and user information

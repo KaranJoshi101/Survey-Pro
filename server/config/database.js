@@ -35,12 +35,22 @@ const normalizeTableName = (raw) => {
 
 const stripPgCasts = (sql) => sql.replace(/::\s*[a-z_][a-z0-9_]*(\[\])?/gi, '');
 
-const replaceIntervalExpressions = (sql) => (
-    sql
-        .replace(/CURRENT_TIMESTAMP\s*\+\s*\(\$(\d+)\s*\|\|\s*'\s*minutes'\)\s*::interval/gi, 'DATE_ADD(CURRENT_TIMESTAMP, INTERVAL $$1 MINUTE)')
+const replaceIntervalExpressions = (sql) => {
+    const withMinuteIntervals = sql
+        // Support both casted and de-casted Postgres interval forms after SQL normalization.
+        .replace(
+            /CURRENT_TIMESTAMP\s*\+\s*\(\$(\d+)\s*\|\|\s*'\s*minutes'\s*\)(?:\s*::interval)?/gi,
+            (_match, idx) => `DATE_ADD(CURRENT_TIMESTAMP, INTERVAL $${idx} MINUTE)`
+        )
+        .replace(
+            /NOW\(\)\s*\+\s*\(\$(\d+)\s*\|\|\s*'\s*minutes'\s*\)(?:\s*::interval)?/gi,
+            (_match, idx) => `DATE_ADD(NOW(), INTERVAL $${idx} MINUTE)`
+        );
+
+    return withMinuteIntervals
         .replace(/NOW\(\)\s*-\s*INTERVAL\s*'(\d+)\s+days'/gi, 'DATE_SUB(NOW(), INTERVAL $1 DAY)')
-        .replace(/INTERVAL\s*'(\d+)\s+days'/gi, 'INTERVAL $1 DAY')
-);
+        .replace(/INTERVAL\s*'(\d+)\s+days'/gi, 'INTERVAL $1 DAY');
+};
 
 const replaceDateTrunc = (sql) => (
     sql

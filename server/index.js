@@ -99,7 +99,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'OK',
-        message: 'Survey Application API is running',
+        message: 'InsightForge API is running',
         timestamp: new Date().toISOString(),
     });
 });
@@ -241,7 +241,7 @@ app.get('/robots.txt', (_req, res) => {
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({
-        message: 'Welcome to Survey Application API',
+        message: 'Welcome to InsightForge API',
         version: '1.0.0',
         endpoints: {
             health: '/api/health',
@@ -355,7 +355,7 @@ const startServer = async () => {
   server = app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════╗
-║     🚀 Survey Application API Server Started      ║
+║     🚀 InsightForge API Server Started      ║
 ╚═══════════════════════════════════════════════════╝
 
 📍 Server running on: http://localhost:${PORT}

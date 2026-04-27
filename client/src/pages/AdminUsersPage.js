@@ -210,7 +210,7 @@ const AdminUsersPage = () => {
                                                     </Button>
                                                 )
                                             )}
-                                            {user.role !== 'admin' && user.is_banned && (
+                                            {user.role !== 'admin' && Boolean(user.is_banned) && (
                                                 <Button
                                                     onClick={() => handleDelete(user.id)}
                                                     variant="danger"

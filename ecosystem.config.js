@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'survey-app-api',
+      name: 'insightforge-api',
       cwd: './server',
       script: 'index.js',
       instances: 1,

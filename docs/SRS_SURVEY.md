@@ -1,18 +1,18 @@
 # Software Requirements Specification
 
-## Survey App
+## InsightForge
 
 **Version:** 2.0  
 **Status:** Revised for current deployed product  
 **Date:** 21 April 2026  
-**Prepared For:** Survey App project stakeholders
+**Prepared For:** InsightForge project stakeholders
 
 ## Revision History
 
 | Version | Date | Description |
 |---|---|---|
-| 1.0 | 11/03/2026 | Initial SRS for early Survey-Pro scope |
-| 2.0 | 21/04/2026 | Revised to reflect current deployed Survey App scope, modules, and interface structure |
+| 1.0 | 11/03/2026 | Initial SRS for early InsightForge scope |
+| 2.0 | 21/04/2026 | Revised to reflect current deployed InsightForge scope, modules, and interface structure |
 
 ## Table of Contents
 
@@ -28,10 +28,10 @@
 ## 1. Introduction
 
 ### 1.1 Purpose
-This SRS defines the current Survey App product, including its user-facing pages, admin capabilities, backend services, database-backed workflows, and deployment-facing constraints. The document is intended to support development, testing, deployment, maintenance, and stakeholder review.
+This SRS defines the current InsightForge product, including its user-facing pages, admin capabilities, backend services, database-backed workflows, and deployment-facing constraints. The document is intended to support development, testing, deployment, maintenance, and stakeholder review.
 
 ### 1.2 Scope
-Survey App is a full-stack PERN web platform used to:
+InsightForge is a full-stack PERN web platform used to:
 - authenticate users and enforce role-based access
 - create, publish, and complete surveys
 - collect and review survey responses
@@ -70,7 +70,7 @@ This document is intended for:
 ## 2. Overall Description
 
 ### 2.1 Product Perspective
-Survey App is a browser-based web application built on a PERN stack:
+InsightForge is a browser-based web application built on a PERN stack:
 - React frontend
 - Node.js and Express backend API
 - PostgreSQL database
@@ -359,4 +359,4 @@ The repository includes incremental migrations for:
 - **Consulting request**: User submission for a consulting service
 
 ### 8.2 Notes
-This revision reflects the current deployed Survey App scope and should be kept aligned with future route, schema, and feature changes.
+This revision reflects the current deployed InsightForge scope and should be kept aligned with future route, schema, and feature changes.

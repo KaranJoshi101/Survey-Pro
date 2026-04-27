@@ -1,4 +1,4 @@
-# Survey App (MySQL Stack)
+# InsightForge (MySQL Stack)
 
 Survey platform built with MySQL, Express, React, and Node.js.
 
@@ -26,7 +26,7 @@ Survey platform built with MySQL, Express, React, and Node.js.
 ## Project Structure
 
 ```text
-survey-app/
+insightforge/
   client/      React frontend
   server/      Express API
   database/    SQL migrations and seed scripts
@@ -63,7 +63,7 @@ For a complete operational and implementation-oriented master document (setup, s
 
 Deployment checklist and production setup are documented in:
 
-`DEPLOYMENT.md`
+`docs/DEPLOYMENT.md`
 
 ## Prerequisites
 
@@ -73,12 +73,12 @@ Deployment checklist and production setup are documented in:
 
 ## Environment Setup
 
-Create a `.env` file in the project root (`survey-app/.env`) with values like:
+Create a `.env` file in the project root (`insightforge/.env`) with values like:
 
 ```env
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=survey_app
+DB_NAME=insightforge
 DB_USER=root
 DB_PASSWORD=your_password
 
@@ -94,7 +94,7 @@ REACT_APP_API_URL=http://localhost:5000/api
 For production, use:
 
 - `.env.production.example` as the template
-- `DEPLOYMENT.md` for full runbook
+- `docs/DEPLOYMENT.md` for full runbook
 
 ## Install Dependencies
 
@@ -116,8 +116,8 @@ Option 2: Manual SQL setup
 
 ```bash
 mysql -u root -p
-CREATE DATABASE survey_app;
-USE survey_app;
+CREATE DATABASE insightforge;
+USE insightforge;
 SOURCE database/mysql/schema.sql;
 SOURCE database/seeds/seed_data.sql;
 ```
@@ -183,7 +183,7 @@ Note: unified analytics route `/admin/analytics` is currently disabled in the ap
 
 ## Push To GitHub
 
-From `survey-app/`:
+From `insightforge/`:
 
 ```bash
 git add .

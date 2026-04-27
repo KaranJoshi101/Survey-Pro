@@ -1,5 +1,5 @@
 {
-  "name": "survey-app-database",
+  "name": "insightforge-database",
   "version": "1.0.0",
   "description": "Database initialization and seeding",
   "main": "init.js",

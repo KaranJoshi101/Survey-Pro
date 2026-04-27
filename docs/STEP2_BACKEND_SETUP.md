@@ -158,7 +158,7 @@ server/
 
 ### 1. Start the Server
 ```bash
-cd /d/softee/survey-app
+cd /d/softee/insightforge
 npm run server
 ```
 
@@ -180,7 +180,7 @@ curl -X POST http://localhost:5000/api/auth/register \
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@surveyapp.com",
+    "email": "admin@insightforge.com",
     "password": "admin123"
   }'
 ```
@@ -198,7 +198,7 @@ curl -X GET http://localhost:5000/api/auth/me \
 ```
 DB_HOST=localhost
 DB_PORT=5433
-DB_NAME=survey_app
+DB_NAME=insightforge
 DB_USER=postgres
 DB_PASSWORD=@Joshi098!
 

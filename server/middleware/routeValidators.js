@@ -2,6 +2,8 @@ const { body, param, query } = require('express-validator');
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+const lowercaseEmail = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : value);
+
 const idParam = (paramName) => [
     param(paramName)
         .isInt({ min: 1 })
@@ -25,7 +27,7 @@ const paginationQuery = [
 const registerValidation = isDev
     ? [
         body('name').isString().trim().isLength({ min: 1, max: 100 }).withMessage('name is required'),
-        body('email').isEmail().withMessage('email must be valid').normalizeEmail(),
+        body('email').isEmail().withMessage('email must be valid').customSanitizer(lowercaseEmail),
         body('password').isString().isLength({ min: 6 }).withMessage('password must be at least 6 characters'),
       ]
     : [
@@ -37,7 +39,7 @@ const registerValidation = isDev
         body('email')
             .isEmail()
             .withMessage('email must be valid')
-            .normalizeEmail(),
+            .customSanitizer(lowercaseEmail),
         body('password')
             .isString()
             .isLength({ min: 10, max: 128 })
@@ -66,7 +68,7 @@ const verifySignupOtpValidation = [
     body('email')
         .isEmail()
         .withMessage('email must be valid')
-        .normalizeEmail(),
+        .customSanitizer(lowercaseEmail),
     body('otp')
         .isString()
         .trim()
@@ -352,7 +354,7 @@ const consultingRequestValidation = [
     body('email')
         .isEmail()
         .withMessage('email must be valid')
-        .normalizeEmail(),
+        .customSanitizer(lowercaseEmail),
     body('message')
         .isString()
         .trim()

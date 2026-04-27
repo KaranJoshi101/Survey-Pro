@@ -1,7 +1,7 @@
 {
-  "name": "survey-app-server",
+  "name": "insightforge-server",
   "version": "1.0.0",
-  "description": "Survey Application Backend - PERN Stack",
+  "description": "InsightForge Backend - PERN Stack",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

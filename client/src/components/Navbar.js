@@ -83,7 +83,7 @@ const Navbar = () => {
                     }}
                 >
                     <FaClipboardList size={20} aria-hidden="true" />
-                    <span>Survey Pro</span>
+                    <span>InsightForge</span>
                 </Link>
                 <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
                     <Link to="/surveys" style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}>Surveys</Link>
@@ -153,7 +153,7 @@ const Navbar = () => {
                     }}
                 >
                     <FaClipboardList size={20} aria-hidden="true" />
-                    <span>Survey Pro</span>
+                    <span>InsightForge</span>
                 </Link>
             </div>
 

@@ -194,8 +194,8 @@ const TrainingPage = () => {
     return (
         <div className="container mt-4 training-page-wrap space-y-6">
             <SeoMeta
-                title={selectedPlaylist ? `${selectedPlaylist.name} | Training | Survey Pro` : 'Training Platform | Survey Pro'}
-                description={selectedPlaylist?.description || selectedCategory?.description || 'Explore categorized training videos and notes on Survey Pro.'}
+                title={selectedPlaylist ? `${selectedPlaylist.name} | Training | InsightForge` : 'Training Platform | InsightForge'}
+                description={selectedPlaylist?.description || selectedCategory?.description || 'Explore categorized training videos and notes on InsightForge.'}
                 keywords={['training videos', 'learning playlists', 'survey training']}
                 path={selectedPlaylist && selectedCategory
                     ? `/training/${toSlug(selectedCategory.name)}/${toSlug(selectedPlaylist.name)}`

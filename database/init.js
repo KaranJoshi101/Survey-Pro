@@ -46,7 +46,7 @@ const initDatabase = async () => {
 
         // Step 1: Create database
         console.log('📦 Creating database...');
-        const dbName = process.env.DB_NAME || 'survey_app';
+        const dbName = process.env.DB_NAME || 'insightforge';
 
         const adminConn = await mysql.createConnection(baseConfig);
 

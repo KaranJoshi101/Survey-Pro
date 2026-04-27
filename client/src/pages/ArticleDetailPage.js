@@ -91,7 +91,7 @@ const ArticleDetailPage = () => {
     return (
         <div className="container mt-4">
             <SeoMeta
-                title={`${article.title} | Survey Pro Articles`}
+                title={`${article.title} | InsightForge Articles`}
                 description={plainText(article.content).slice(0, 160)}
                 keywords={['article', 'survey insights', article.author_name || 'author']}
                 path={`/articles/${article.slug || slug}`}

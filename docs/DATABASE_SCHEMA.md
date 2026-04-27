@@ -2,7 +2,7 @@
 
 ## Overview
 
-Survey App uses MySQL 8 in runtime with a pg-compatible adapter in the server data layer.
+InsightForge uses MySQL 8 in runtime with a pg-compatible adapter in the server data layer.
 The schema supports user management, survey creation, response collection, content publishing, and analytics/event tracking.
 
 ## Core Tables

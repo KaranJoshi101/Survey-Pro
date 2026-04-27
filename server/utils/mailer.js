@@ -361,7 +361,7 @@ const sendSurveySubmissionEmail = async ({
 
     try {
         const smtpMeta = await sendSmtpWithFallback((config) => ({
-            from: `${config.fromName || 'Survey App'} <${config.fromEmail}>`,
+            from: `${config.fromName || 'InsightForge'} <${config.fromEmail}>`,
             to,
             subject: payload.subject,
             text: payload.text,
@@ -395,7 +395,7 @@ const sendSignupOtpEmail = async ({ to, userName, otpCode, expiresMinutes = 10 }
     }
 
     const displayName = userName || 'there';
-    const subject = 'Your Survey Pro signup verification code';
+    const subject = 'Your InsightForge signup verification code';
     const text = [
         `Hello ${displayName},`,
         '',
@@ -404,7 +404,7 @@ const sendSignupOtpEmail = async ({ to, userName, otpCode, expiresMinutes = 10 }
         '',
         'If you did not request this code, please ignore this email.',
         '',
-        'Survey Pro Team',
+        'InsightForge Team',
     ].join('\n');
 
     const html = `
@@ -413,12 +413,12 @@ const sendSignupOtpEmail = async ({ to, userName, otpCode, expiresMinutes = 10 }
         <p style="font-size: 1.6rem; font-weight: 700; letter-spacing: 4px; margin: 12px 0;">${otpCode}</p>
         <p>This code expires in ${expiresMinutes} minutes.</p>
         <p>If you did not request this code, please ignore this email.</p>
-        <p>Survey Pro Team</p>
+        <p>InsightForge Team</p>
     `;
 
     try {
         const smtpMeta = await sendSmtpWithFallback((config) => ({
-            from: `${config.fromName || 'Survey Pro'} <${config.fromEmail}>`,
+            from: `${config.fromName || 'InsightForge'} <${config.fromEmail}>`,
             to,
             subject,
             text,

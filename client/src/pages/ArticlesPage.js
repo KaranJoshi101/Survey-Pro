@@ -90,8 +90,8 @@ const ArticlesPage = () => {
     return (
         <div className="container mt-4">
             <SeoMeta
-                title="Published Articles | Survey Pro"
-                description="Read published insights, research notes, and practical guidance from Survey Pro."
+                title="Published Articles | InsightForge"
+                description="Read published insights, research notes, and practical guidance from InsightForge."
                 keywords={['published articles', 'survey research', 'guides', 'insights']}
                 path="/articles"
             />

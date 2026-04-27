@@ -31,7 +31,7 @@ Interpretation:
 
 Dry-run query report summary:
 
-- Database: survey_app
+- Database: insightforge
 - Host/Port: localhost:3306
 - Foreign keys discovered: 28
 - Core migration tables checked: 21/21 present

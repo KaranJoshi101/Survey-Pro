@@ -14,7 +14,7 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
-DB_NAME=survey_app
+DB_NAME=insightforge
 
 # Server
 NODE_ENV=development
@@ -179,7 +179,7 @@ Expected: `inserted: X, skipped: 0`
 ## Files You Need to Edit
 
 ```
-survey-app/
+insightforge/
 ├── .env  ← YOU EDIT THIS FILE (created from .env.example)
 ├── server/
 │   ├── index.js  ← Should have: require('dotenv').config()
@@ -204,7 +204,7 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
-DB_NAME=survey_app
+DB_NAME=insightforge
 NODE_ENV=development
 SERVER_PORT=5000
 JWT_SECRET=$(openssl rand -base64 32)

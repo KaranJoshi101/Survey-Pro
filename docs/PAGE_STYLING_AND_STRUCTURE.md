@@ -1,4 +1,4 @@
-# Survey App: Page Styling and Structure Reference
+# InsightForge: Page Styling and Structure Reference
 
 ## 1. Styling Architecture
 
