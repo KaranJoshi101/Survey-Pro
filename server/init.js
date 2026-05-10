@@ -2,7 +2,9 @@
 const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const { loadEnvironment } = require('./config/loadEnv');
+
+loadEnvironment(path.join(__dirname, '..'));
 
 const baseConfig = {
     host: process.env.DB_HOST || 'localhost',

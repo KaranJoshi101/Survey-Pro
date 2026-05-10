@@ -1,5 +1,27 @@
 /* === UI/UX ELEVATION PATCH === */
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    width: 100%;
+    min-width: 0;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+main.app-shell {
+    width: 100%;
+    min-width: 0;
+}
+
 /* --- Typography Hierarchy --- */
 h1, .h1 {
     font-size: 2.2rem;
@@ -157,6 +179,29 @@ input:focus, textarea:focus, select:focus {
     padding-left: 32px;
     padding-right: 32px;
 }
+
+.container,
+.page-shell-wide {
+    width: 100%;
+    min-width: 0;
+}
+
+.card,
+.survey-card,
+.admin-table-card,
+.dashboard-action-card,
+.admin-stat-card,
+.admin-management-link,
+.survey-question-card,
+.response-list-card,
+.response-answer-box {
+    min-width: 0;
+}
+
+table {
+    width: 100%;
+}
+
 .page-header, .admin-page-header {
     padding: 36px 36px 24px 36px;
     border-radius: 14px;
@@ -176,6 +221,30 @@ input:focus, textarea:focus, select:focus {
 }
 .admin-page-actions {
     gap: 12px;
+}
+
+.page-header,
+.admin-page-header,
+.dashboard-action-grid,
+.admin-stats-grid,
+.admin-management-grid,
+.admin-chart-grid,
+.admin-responses-layout,
+.survey-analytics-chart-split,
+.survey-analytics-rating-split,
+.consulting-detail-layout,
+.survey-meta-row,
+.response-list,
+.admin-chip-row {
+    min-width: 0;
+}
+
+.card table,
+.admin-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* --- Micro-interactions --- */
@@ -222,6 +291,12 @@ input:focus, textarea:focus, select:focus {
     }
     .page-header, .admin-page-header {
         padding: 24px 10px 16px 10px;
+    }
+
+    .dashboard-action-grid,
+    .admin-stats-grid,
+    .admin-management-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -812,9 +887,21 @@ tr:hover td {
 
 .admin-stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
     margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .admin-stat-card {
@@ -856,9 +943,9 @@ tr:hover td {
 .admin-chart-grid {
     display: flex;
     flex-direction: row;
-    gap: 32px;
+    gap: 24px;
     margin-bottom: 32px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: stretch;
     justify-content: center;
 }
@@ -872,6 +959,25 @@ tr:hover td {
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
+}
+
+@media (max-width: 1200px) {
+    .admin-chart-grid .card {
+        max-width: 100%;
+        min-width: 280px;
+        min-height: 420px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-chart-grid {
+        flex-direction: column;
+    }
+
+    .admin-chart-grid .card {
+        flex: 1 1 auto;
+        min-height: 360px;
+    }
 }
 
 .admin-chart-grid .card-body {
@@ -2192,7 +2298,14 @@ select:focus {
     display: grid;
     grid-template-columns: 3fr 2fr;
     gap: 24px;
-    align-items: center;
+    align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+    .survey-analytics-chart-split {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
 }
 
 .survey-analytics-rating-split {
@@ -2224,6 +2337,12 @@ select:focus {
     min-width: 190px;
 }
 
+@media (max-width: 768px) {
+    .admin-analytics-toolbar-left select {
+        min-width: auto;
+    }
+}
+
 .admin-chart-canvas {
     height: 340px;
     min-height: 340px;
@@ -2236,8 +2355,43 @@ select:focus {
     max-height: 320px;
 }
 
-.admin-table {
+.admin-table,
+table {
     table-layout: auto;
+    border-collapse: collapse;
+}
+
+tbody tr {
+    display: table-row;
+}
+
+@media (max-width: 768px) {
+    .admin-table,
+    table {
+        font-size: 0.9rem;
+    }
+
+    .admin-table th,
+    .admin-table td,
+    table th,
+    table td {
+        padding: 12px 10px;
+        word-break: break-word;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-table,
+    table {
+        font-size: 0.85rem;
+    }
+
+    .admin-table th,
+    .admin-table td,
+    table th,
+    table td {
+        padding: 10px 8px;
+    }
 }
 
 img,
@@ -2261,6 +2415,17 @@ canvas {
 }
 
 @media (max-width: 768px) {
+    .page-header,
+    .admin-page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header .btn,
+    .admin-page-actions .btn {
+        width: 100%;
+    }
+
     .responsive-two-col-grid {
         grid-template-columns: 1fr;
     }
@@ -2351,5 +2516,17 @@ canvas {
     .admin-actions-wrap .btn,
     .admin-page-actions .btn {
         width: 100%;
+    }
+
+    .page-header,
+    .admin-page-header {
+        padding: 20px 16px 16px;
+        border-radius: 12px;
+    }
+
+    .card,
+    .survey-card,
+    .admin-table-card {
+        border-radius: 10px;
     }
 }

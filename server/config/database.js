@@ -1,6 +1,9 @@
 // Database connection configuration
 const mysql = require('mysql2/promise');
-require('dotenv').config();
+const path = require('path');
+const { loadEnvironment } = require('./loadEnv');
+
+loadEnvironment(path.join(__dirname, '../..'));
 
 const parseBoolean = (value, defaultValue = false) => {
     if (value === undefined || value === null || value === '') {

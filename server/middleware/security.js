@@ -3,30 +3,41 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const isDev = process.env.NODE_ENV !== 'production';
+const allowedRequestHeaders = ['Content-Type', 'Authorization', 'x-session-id'];
 
 const getAllowedOrigins = () => {
     const configured = process.env.CORS_ORIGINS || process.env.CLIENT_URL || '';
 
     return configured
         .split(',')
-        .map((value) => value.trim())
+        .map((value) => value.trim().replace(/\/+$/, ''))
         .filter(Boolean);
 };
 
 // In development: allow all origins. In production: strict allowlist.
 const corsOptions = isDev
-    ? { origin: true, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true }
+    ? { origin: true, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], allowedHeaders: allowedRequestHeaders, credentials: true }
     : {
         origin: (origin, callback) => {
+            // allow server-to-server or curl (no origin) but enforce allowlist for browser origins
             if (!origin) return callback(null, true);
             const allowedOrigins = getAllowedOrigins();
-            if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+            // Validate allowedOrigins for production safety
+            const invalidConfigured = allowedOrigins.filter((o) => o.startsWith('http:') || o.includes('localhost'));
+            if (invalidConfigured.length) {
+                console.error('CORS_ORIGINS contains insecure or localhost entries:', invalidConfigured.join(', '));
+                return callback(new Error('Server CORS configuration invalid - remove http:// or localhost entries from CORS_ORIGINS'), false);
+            }
+            if (allowedOrigins.length === 0) {
+                return callback(new Error('No CORS origins configured for production'), false);
+            }
+            if (allowedOrigins.includes(origin.replace(/\/+$/, ''))) {
                 return callback(null, true);
             }
             return callback(new Error('CORS policy blocked this origin'));
         },
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+                allowedHeaders: allowedRequestHeaders,
         credentials: false,
         maxAge: 86400,
       };

@@ -1,6 +1,6 @@
-# InsightForge (MySQL Stack)
+# InsightForge
 
-Survey platform built with MySQL, Express, React, and Node.js.
+Survey and content platform built with MySQL, Express, React, and Node.js.
 
 ## Features
 
@@ -16,12 +16,16 @@ Survey platform built with MySQL, Express, React, and Node.js.
 - Consulting services and authenticated consultation request workflow
 - Consulting analytics with period selector (`7d`, `30d`, `all`)
 - Admin dashboard for users, surveys, responses, content, and consulting
+- SEO slugs, scheduled article publishing, and draft autosave support
+- Platform and consulting event tracking with session-based analytics
+- OTP-gated registration and live ban enforcement on authenticated requests
 
 ## Tech Stack
 
-- Backend: Node.js, Express, MySQL
+- Backend: Node.js, Express, MySQL via `mysql2/promise`
 - Frontend: React (CRA + CRACO)
 - Auth: JWT + bcrypt
+- Ops: PM2, Nodemon, health checks, and smoke tests
 
 ## Project Structure
 
@@ -29,7 +33,7 @@ Survey platform built with MySQL, Express, React, and Node.js.
 insightforge/
   client/      React frontend
   server/      Express API
-  database/    SQL migrations and seed scripts
+  database/    SQL migrations, seed scripts, and consolidated master schema
   docs/        Project documentation
 ```
 
@@ -45,7 +49,7 @@ Use two image locations depending on the use case:
 Public URL patterns:
 
 - Frontend static: `/static/images/<subfolder>/<file-name>`
-- Backend uploads: `http://localhost:5000/uploads/articles/<file-name>`
+- Backend uploads: `${REACT_APP_API_URL or API base}/uploads/articles/<file-name>`
 
 Details and examples: `docs/IMAGE_STORAGE.md`
 
@@ -58,6 +62,10 @@ For a single consolidated source containing architecture, use cases, DFD inputs,
 For a complete operational and implementation-oriented master document (setup, scripts, architecture, modules, deployment, and documentation map), use:
 
 `docs/PROJECT_DOCUMENTATION.md`
+
+For the complete consolidated migration script, use:
+
+`database/master_migrations.sql`
 
 ## Deployment
 
@@ -81,14 +89,28 @@ DB_PORT=3306
 DB_NAME=insightforge
 DB_USER=root
 DB_PASSWORD=your_password
+DB_SSL=false
 
 SERVER_PORT=5000
 NODE_ENV=development
+TRUST_PROXY=0
 
 JWT_SECRET=replace_with_a_long_random_secret
 JWT_EXPIRE=1h
 
+CORS_ORIGINS=http://localhost:3000
+RATE_LIMIT_MAX=300
+AUTH_RATE_LIMIT_MAX=20
+
 REACT_APP_API_URL=http://localhost:5000/api
+
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_email
+SMTP_PASS=your_password
+SMTP_FROM_EMAIL=your_email
+SMTP_FROM_NAME=InsightForge
 ```
 
 For production, use:
@@ -121,6 +143,8 @@ USE insightforge;
 SOURCE database/mysql/schema.sql;
 SOURCE database/seeds/seed_data.sql;
 ```
+
+If you want the full schema in one file, use `database/master_migrations.sql` instead of the split migration set.
 
 ## Run The Project
 
@@ -155,6 +179,8 @@ App URLs:
 - `npm run pm2:restart` - Restart PM2 app and refresh env
 - `npm run pm2:stop` - Stop PM2 app
 - `npm run db:init` - Initialize database
+- `npm run seed:consulting` - Seed consulting requests and events
+- `npm run verify:consulting-seed` - Verify consulting seed data
 - `npm run db:sync:prod` - Backup production DB, sync local DB to production, and verify counts
 - `npm run install-all` - Install root/server/client dependencies
 
@@ -177,9 +203,10 @@ Note: unified analytics route `/admin/analytics` is currently disabled in the ap
 
 ## Verified Migration Notes
 
-- Runtime validation completed against MySQL 8 with the pg-compatible adapter in `server/config/database.js`.
-- Bootstrap normalizes legacy seed SQL at init time, so the checked-in seed files can remain as compatibility sources.
-- The admin/protected regression matrix was revalidated on a fresh API instance after a stale port-5000 process was detected.
+- Runtime validation is based on the MySQL connection pool in `server/config/database.js`.
+- The schema is available both as split migrations and as the consolidated `database/master_migrations.sql` file.
+- Live session tracking, consulting events, and platform events are stored in MySQL rather than Redis or an external cache.
+- The admin/protected regression matrix was revalidated on a fresh API instance after a stale port conflict was detected.
 
 ## Push To GitHub
 

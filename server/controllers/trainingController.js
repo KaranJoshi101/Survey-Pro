@@ -907,6 +907,8 @@ const deleteCategoryNote = async (req, res, next) => {
     }
 };
 
+const { buildUrl } = require('../utils/baseUrl');
+
 const uploadTrainingNoteDocument = async (req, res, next) => {
     try {
         const file = req.file;
@@ -918,7 +920,7 @@ const uploadTrainingNoteDocument = async (req, res, next) => {
         const document = {
             name: file.originalname,
             path: `/uploads/training-notes/${fileName}`,
-            url: `${req.protocol}://${req.get('host')}/uploads/training-notes/${fileName}`,
+            url: buildUrl(`/uploads/training-notes/${fileName}`),
             size: file.size,
             mimeType: file.mimetype,
         };

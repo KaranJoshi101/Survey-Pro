@@ -78,7 +78,7 @@ const AppContent = () => {
     return (
         <>
             <Navbar />
-            <main style={{ minHeight: 'calc(100vh - 60px)', paddingBottom: '32px' }}>
+            <main className="app-shell" style={{ minHeight: 'calc(100vh - 60px)', paddingBottom: '32px' }}>
                 <Suspense fallback={<LoadingSpinner fullScreen={false} />}>
                 <Routes>
                     {/* Public Routes */}

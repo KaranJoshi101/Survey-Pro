@@ -5,10 +5,39 @@ import analyticsService from '../services/analyticsService';
 import BackLink from '../components/BackLink';
 import { useAuth } from '../context/AuthContext';
 import SeoMeta from '../components/SeoMeta';
+import { API_ORIGIN } from '../config/api';
 import { toSlug } from '../utils/slug';
 import './TrainingPage.css';
 
 const thumbnailFor = (youtubeId) => `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+
+const resolveDocumentUrl = (value) => {
+    if (!value || typeof value !== 'string') {
+        return '';
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return '';
+    }
+
+    if (trimmed.startsWith('/uploads/')) {
+        return `${API_ORIGIN}${trimmed}`;
+    }
+
+    if (/^https?:\/\//i.test(trimmed)) {
+        try {
+            const parsed = new URL(trimmed);
+            if (process.env.NODE_ENV !== 'production' && parsed.pathname.startsWith('/uploads/')) {
+                return `${API_ORIGIN}${parsed.pathname}${parsed.search}${parsed.hash}`;
+            }
+        } catch (_err) {
+            return trimmed;
+        }
+    }
+
+    return trimmed;
+};
 
 const TrainingPage = () => {
     const { isAuthenticated } = useAuth();
@@ -336,7 +365,7 @@ const TrainingPage = () => {
                                                 <strong style={{ fontSize: '15px', color: '#003594', wordBreak: 'break-word', flex: 1 }}>{note.title || '(Untitled Note)'}</strong>
                                                 {note.document_url && (
                                                     <a
-                                                        href={note.document_url}
+                                                        href={resolveDocumentUrl(note.document_url)}
                                                         target="_blank"
                                                         rel="noreferrer"
                                                         className="transition-all duration-200 ease-in-out hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(0,53,148,0.35)] active:scale-95"

@@ -2,7 +2,9 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const { loadEnvironment } = require('./config/loadEnv');
+
+loadEnvironment(path.join(__dirname, '..'));
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -25,6 +27,7 @@ const {
 } = require('./middleware/security');
 const pool = require('./config/database');
 const { toSlugBase } = require('./utils/slug');
+const { SITE_URL } = require('./utils/baseUrl');
 
 const app = express();
 
@@ -52,7 +55,7 @@ const assertSecurityConfig = () => {
 
 assertSecurityConfig();
 
-const SITE_URL = String(process.env.SITE_URL || process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
+// SITE_URL is provided by server/utils/baseUrl and validated for production environments
 
 const escapeXml = (value) => String(value || '')
   .replace(/&/g, '&amp;')
@@ -94,6 +97,10 @@ app.use('/api/media', mediaRoutes);
 app.use('/api/training', trainingRoutes);
 app.use('/api/consulting', consultingRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use((req, res, next) => {
+  console.log("Incoming:", req.method, req.url);
+  next();
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -341,9 +348,9 @@ const ensureSurveySlugColumn = async () => {
   }
 };
 
-const PORT = Number(process.env.SERVER_PORT || 5000);
+const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 5000);
 if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
-  throw new Error('SERVER_PORT must be a valid port number between 1 and 65535');
+  throw new Error('PORT or SERVER_PORT must be a valid port number between 1 and 65535');
 }
 
 let server;
@@ -400,7 +407,7 @@ Consulting:
 
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.error(`❌ Port ${PORT} is already in use. Set SERVER_PORT to a free port or stop the process using it.`);
+      console.error(`❌ Port ${PORT} is already in use. Set PORT or SERVER_PORT to a free port or stop the process using it.`);
       process.exit(1);
     }
 
