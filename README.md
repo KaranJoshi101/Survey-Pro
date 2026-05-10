@@ -22,7 +22,7 @@ Survey and content platform built with Postgres, Express, React, and Node.js.
 
 ## Tech Stack
 
--- Backend: Node.js, Express, Postgres via `pg`
+- Backend: Node.js, Express, Postgres via `pg`
 - Frontend: React (CRA + CRACO)
 - Auth: JWT + bcrypt
 - Ops: PM2, Nodemon, health checks, and smoke tests
@@ -175,7 +175,7 @@ App URLs:
 - `npm run pm2:start` - Start backend with PM2 using `ecosystem.config.js`
 - `npm run pm2:restart` - Restart PM2 app and refresh env
 - `npm run pm2:stop` - Stop PM2 app
--- `npm run db:init` - Initialize database (creates DB and applies dump/migrations)
+`npm run db:init` - Initialize database (creates DB and applies dump/migrations)
 - `npm run seed:consulting` - Seed consulting requests and events
 - `npm run verify:consulting-seed` - Verify consulting seed data
 - `npm run db:sync:prod` - Backup production DB, sync local DB to production, and verify counts
