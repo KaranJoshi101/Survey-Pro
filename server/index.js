@@ -2,7 +2,9 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const { loadEnvironment } = require('./config/loadEnv');
+
+loadEnvironment(path.join(__dirname, '..'));
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -25,6 +27,7 @@ const {
 } = require('./middleware/security');
 const pool = require('./config/database');
 const { toSlugBase } = require('./utils/slug');
+const { SITE_URL } = require('./utils/baseUrl');
 
 const app = express();
 
@@ -52,7 +55,7 @@ const assertSecurityConfig = () => {
 
 assertSecurityConfig();
 
-const SITE_URL = String(process.env.SITE_URL || process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/$/, '');
+// SITE_URL is provided by server/utils/baseUrl and validated for production environments
 
 const escapeXml = (value) => String(value || '')
   .replace(/&/g, '&amp;')
@@ -94,6 +97,10 @@ app.use('/api/media', mediaRoutes);
 app.use('/api/training', trainingRoutes);
 app.use('/api/consulting', consultingRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use((req, res, next) => {
+  console.log("Incoming:", req.method, req.url);
+  next();
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -272,78 +279,60 @@ app.use(errorHandler);
 const ensureSignupOtpTable = async () => {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS signup_otp_verifications (
-      id INT AUTO_INCREMENT PRIMARY KEY,
+      id SERIAL PRIMARY KEY,
       email VARCHAR(255) NOT NULL UNIQUE,
       name VARCHAR(100) NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
       otp_hash VARCHAR(255) NOT NULL,
-      expires_at DATETIME NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
       attempts INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
 
   const emailIndexCheck = await pool.query(
-    `SELECT COUNT(*) AS index_count
-     FROM information_schema.statistics
-     WHERE table_schema = DATABASE()
-       AND table_name = 'signup_otp_verifications'
-       AND index_name = 'idx_signup_otp_email'`
+    `SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'signup_otp_verifications' AND indexname = 'idx_signup_otp_email'`
   );
 
-  if (Number(emailIndexCheck.rows[0]?.index_count || 0) === 0) {
+  if (emailIndexCheck.rows.length === 0) {
     await pool.query('CREATE INDEX idx_signup_otp_email ON signup_otp_verifications (email)');
   }
 
   const expiresIndexCheck = await pool.query(
-    `SELECT COUNT(*) AS index_count
-     FROM information_schema.statistics
-     WHERE table_schema = DATABASE()
-       AND table_name = 'signup_otp_verifications'
-       AND index_name = 'idx_signup_otp_expires_at'`
+    `SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'signup_otp_verifications' AND indexname = 'idx_signup_otp_expires_at'`
   );
 
-  if (Number(expiresIndexCheck.rows[0]?.index_count || 0) === 0) {
+  if (expiresIndexCheck.rows.length === 0) {
     await pool.query('CREATE INDEX idx_signup_otp_expires_at ON signup_otp_verifications (expires_at)');
   }
 };
 
 const ensureSurveySlugColumn = async () => {
   const slugColumnCheck = await pool.query(
-    `SELECT COUNT(*) AS column_count
-     FROM information_schema.columns
-     WHERE table_schema = DATABASE()
-       AND table_name = 'surveys'
-       AND column_name = 'slug'`
+    `SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'surveys' AND column_name = 'slug'`
   );
 
-  if (Number(slugColumnCheck.rows[0]?.column_count || 0) === 0) {
+  if (slugColumnCheck.rows.length === 0) {
     await pool.query('ALTER TABLE surveys ADD COLUMN slug VARCHAR(120) NULL');
   }
 
   await pool.query(
-    `UPDATE surveys
-     SET slug = CONCAT('survey-', id)
-     WHERE slug IS NULL OR slug = ''`
+    `UPDATE surveys SET slug = 'survey-' || id WHERE slug IS NULL OR slug = ''`
   );
 
   const slugIndexCheck = await pool.query(
-    `SELECT COUNT(*) AS index_count
-     FROM information_schema.statistics
-     WHERE table_schema = DATABASE()
-       AND table_name = 'surveys'
-       AND index_name = 'idx_surveys_slug_unique'`
+    `SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'surveys' AND indexname = 'idx_surveys_slug_unique'`
   );
 
-  if (Number(slugIndexCheck.rows[0]?.index_count || 0) === 0) {
+  if (slugIndexCheck.rows.length === 0) {
     await pool.query('CREATE UNIQUE INDEX idx_surveys_slug_unique ON surveys (slug)');
   }
 };
 
-const PORT = Number(process.env.SERVER_PORT || 5000);
+const PORT = Number(process.env.PORT || process.env.SERVER_PORT || 5000);
 if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
-  throw new Error('SERVER_PORT must be a valid port number between 1 and 65535');
+  throw new Error('PORT or SERVER_PORT must be a valid port number between 1 and 65535');
 }
 
 let server;
@@ -400,7 +389,7 @@ Consulting:
 
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.error(`❌ Port ${PORT} is already in use. Set SERVER_PORT to a free port or stop the process using it.`);
+      console.error(`❌ Port ${PORT} is already in use. Set PORT or SERVER_PORT to a free port or stop the process using it.`);
       process.exit(1);
     }
 

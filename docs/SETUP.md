@@ -1,6 +1,6 @@
 # Setup Guide - InsightForge
 
-Follow these steps to run the app locally with the current MySQL-based backend.
+Follow these steps to run the app locally with the current Postgres backend.
 
 ## Prerequisites
 
@@ -13,32 +13,32 @@ Install the following first:
 2. npm 9+
    - Verify: `npm --version`
 
-3. MySQL 8+
-   - Verify: `mysql --version`
+3. Postgres 12+
+   - Verify: `psql --version`
 
 4. Git (optional)
    - Download: https://git-scm.com/
 
-## Step 1: Verify MySQL Is Running
+## Step 1: Verify Postgres Is Running
 
 On Windows:
 1. Open Services (`Win + R`, then `services.msc`).
-2. Ensure your MySQL service is running.
+2. Ensure your PostgreSQL service is running.
 3. Test CLI access:
 
 ```bash
-mysql -u root -p
+psql -U postgres
 ```
 
-If you can connect, MySQL is ready.
+If you can connect, Postgres is ready.
 
 ## Step 2: Configure Environment Variables
 
-Create or update `.env` in the project root with MySQL values:
+Create or update `.env` in the project root with Postgres values:
 
 ```env
 DB_HOST=localhost
-DB_PORT=3306
+DB_PORT=5432
 DB_NAME=insightforge
 DB_USER=root
 DB_PASSWORD=your_password
@@ -50,7 +50,7 @@ JWT_SECRET=replace_with_a_long_random_secret
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
-If your MySQL username or password differs, adjust `DB_USER` and `DB_PASSWORD`.
+If your Postgres username or password differs, adjust `DB_USER` and `DB_PASSWORD`.
 
 ## Step 3: Install Dependencies
 
@@ -79,7 +79,7 @@ npm run init
 
 Expected result:
 - Database is created if missing.
-- MySQL schema is applied.
+- Dump or migrations are applied to Postgres.
 - Seed data is inserted.
 
 ## Step 5: Start the Application
@@ -130,9 +130,9 @@ curl http://localhost:5000/api/health
 
 ## Common Troubleshooting
 
-Error: `connect ECONNREFUSED 127.0.0.1:3306`
-- MySQL is not running, or port is different.
-- Start MySQL service and verify `DB_PORT`.
+Error: `connect ECONNREFUSED 127.0.0.1:5432`
+- Postgres is not running, or port is different.
+- Start Postgres service and verify `DB_PORT`.
 
 Error: `Access denied for user ...`
 - Wrong credentials in `.env`.

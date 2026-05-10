@@ -1,7 +1,7 @@
 # InsightForge - Complete Project Documentation
 
-Version: 1.4
-Last Updated: 2026-04-27 (documentation consolidation and runtime defaults sync)
+Version: 1.5
+Last Updated: 2026-05-05 (current runtime, security, and master migration sync)
 
 ## 1. Project Overview
 
@@ -14,10 +14,11 @@ InsightForge is a full-stack platform for creating surveys, collecting responses
 - Provide response analytics and export-ready reporting data.
 - Support content workflows for articles, media feed, and training resources.
 - Support consulting services pages with lead capture requests.
+- Support SEO-friendly content workflows, draft autosave, scheduling, and unified event tracking.
 
 ### Core Stack
 - Frontend: React (CRA + CRACO), React Router, Axios, Chart.js
-- Backend: Node.js, Express, MySQL (mysql2)
+- Backend: Node.js, Express, MySQL via `mysql2/promise`
 - Auth/Security: JWT, bcryptjs, helmet, CORS policy, rate limiting
 - Uploads: Multer + static serving from backend uploads directory
 
@@ -35,18 +36,19 @@ insightforge/
   ecosystem.config.js      PM2 config
   docs/DEPLOYMENT.md       Production deployment runbook
   docs/QUICK_START.md      Quick-start guide
+  database/master_migrations.sql  Consolidated migration script (01-26)
 ```
 
 ## 3. Runtime Architecture
 
 ### Ports and URL Defaults
 - Frontend: 3000
-- Backend API: 5002 (current local default via .env)
+- Backend API: 5000 (current local default via `.env`)
 - API base path: /api
 - Health: /api/health
 - DB health: /api/health/db
-- Frontend dev proxy default: http://localhost:5002 (from client/package.json `proxy`)
-- Frontend explicit API base (when configured): REACT_APP_API_URL (for example http://localhost:5002/api)
+- Frontend explicit API base (when configured): REACT_APP_API_URL (for example http://localhost:5000/api)
+- Production deployments should use HTTPS API URLs behind a reverse proxy
 
 ### Backend Route Mounts
 - /api/auth
@@ -62,11 +64,13 @@ insightforge/
 
 ### Security and Middleware (server)
 - `helmet`-based security headers via middleware wrapper.
-- Global rate limiter and auth-specific limiter settings.
-- CORS configuration from environment values.
+- Global rate limiter, auth-specific limiter, and analytics-event limiter.
+- CORS configuration from environment values with production allowlist enforcement.
+- Custom header support for `x-session-id` to support event/session tracking.
 - JSON body size stricter in production.
-- Optional proxy trust controlled by TRUST_PROXY.
+- Optional proxy trust controlled by `TRUST_PROXY`.
 - Production bootstrap validation for JWT secret and CORS origin config.
+- Immediate ban enforcement on authenticated requests via live database lookup.
 
 ## 4. Frontend Application Surface
 
@@ -80,12 +84,14 @@ insightforge/
 - Media feed and media detail
 - Training pages
 - Consulting services pages and service detail/request flow
+- Mobile-responsive layouts and card/grid/table hardening across public and admin screens
 
 ### Consulting UX Enhancements (Recent)
 - Consulting listing page upgraded with trust-focused hero, improved card hierarchy, and stronger conversion CTA.
 - Consulting detail page upgraded with structured content sections (Overview, What We Do, Our Approach, Why It Matters).
 - Request panel improved with trust indicators, helper text, inline field validation, loading/disabled states, and success confirmation.
 - Name/email autofill added on consultation form when user is authenticated.
+- Consulting analytics now use period selectors and event/session tracking stored in MySQL.
 
 ### Admin Pages
 - Admin dashboard
@@ -125,6 +131,8 @@ insightforge/
 - middleware/: auth, security, validation, error handling, logging
 - utils/: helper utilities (feature-specific)
 - uploads/: runtime uploaded assets
+- scripts/: seed, verification, and sync helpers
+- analytics: platform and consulting event capture written to MySQL tables
 
 ## 6. Database Design and Evolution
 
@@ -143,6 +151,7 @@ insightforge/
 - consulting_services and consulting_requests
 - consulting_events (consulting engagement events)
 - platform_events (unified analytics event store; UI route currently disabled)
+- survey_conditional_rules, survey_drafts, and article_drafts
 
 ### Consulting Data Model (Current)
 - `consulting_services`
@@ -155,6 +164,8 @@ insightforge/
 - Response deduplication is controlled per survey via allow_multiple_submissions.
 - FK cascade strategy removes dependent records on parent delete.
 - ENUM-driven constraints for user roles, survey status, and question type.
+- Slugs for surveys and articles are generated and deduplicated in SQL.
+- Media posts support draft/published lifecycle and may link to either surveys or articles.
 
 ### Migration History
 - 01_initial_schema.sql
@@ -184,6 +195,8 @@ insightforge/
 - 25_allow_multiple_submissions.sql
 - 26_add_article_scheduling.sql
 
+The same sequence is also available as a single consolidated script at `database/master_migrations.sql`.
+
 ## 7. Local Development Setup
 
 ### Prerequisites
@@ -199,6 +212,7 @@ Create .env from .env.example and configure:
 - CORS_ORIGINS, RATE_LIMIT_MAX, AUTH_RATE_LIMIT_MAX
 - REACT_APP_API_URL
 - SMTP_* values if submission email is needed
+- DB_POOL_SIZE if you want to tune connection concurrency
 
 ### Install and Run
 From project root:
@@ -215,6 +229,8 @@ Or run services separately:
 npm run server
 npm run client
 ```
+
+The backend uses a MySQL connection pool with queued connections, so concurrent API traffic is handled without a Redis cache layer.
 
 ## 8. Build, Deploy, and Operations
 
@@ -257,6 +273,8 @@ Includes checks for health, login, and build artifacts.
 - start and start:server: run backend production mode
 - pm2:start | pm2:restart | pm2:stop
 - db:init: initialize DB
+- seed:consulting: seed consulting requests and events
+- verify:consulting-seed: verify consulting seed data
 - db:sync:prod: backup production, sync local DB to production, verify core table counts
 - seed:consulting: seed consulting requests + consulting analytics events
 - verify:consulting-seed: verify seeded consulting request/event counts

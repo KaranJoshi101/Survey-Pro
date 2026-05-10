@@ -6,9 +6,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const API_ORIGIN = API_BASE.replace(/\/api\/?$/, '');
+import { API_ORIGIN } from '../config/api';
 
 const normalizeLinkHref = (href) => {
     if (!href) return href;

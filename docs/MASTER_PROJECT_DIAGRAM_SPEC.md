@@ -4,7 +4,7 @@ Version: 1.0
 Date: 2026-03-23  
 Scope: Full project modeling source for architecture, use case, DFD, sequence, ER/RDBMS, and UML diagrams.
 
-Update note (2026-04-26): Runtime data layer migrated to MySQL with a pg-compatible adapter.
+Update note (2026-05-05): Runtime data layer uses MySQL via `mysql2/promise`, with consolidated migrations and expanded consulting/training/media workflows.
 
 ## 1. Purpose
 
@@ -60,6 +60,9 @@ Public routes:
 - /articles/:slug
 - /surveys
 - /surveys/:slug
+- /media
+- /consulting
+- /training
 
 Authenticated user routes:
 - /dashboard
@@ -67,9 +70,16 @@ Authenticated user routes:
 - /responses
 - /responses/:id
 - /profile
+- /media/:id
+- /training/:category/:playlist
+- /consulting/:slug
 
 Authenticated admin routes:
 - /admin
+- /admin/media
+- /admin/training
+- /admin/consulting
+- /admin/consulting/analytics
 - /admin/articles
 - /admin/responses
 - /admin/users
@@ -107,6 +117,16 @@ Authenticated admin routes:
 - UC-S11 View survey analytics
 - UC-S12 View survey demographics
 - UC-S13 Export survey responses to Excel
+
+### Content, Media, Training, and Consulting
+- UC-C1 Browse consulting services
+- UC-C2 Submit consulting request
+- UC-C3 Review consulting analytics (admin)
+- UC-M1 Browse media feed
+- UC-M2 Open linked talk/feedback content
+- UC-T1 Browse training categories and playlists
+- UC-T2 Read training notes and documents
+- UC-T3 Manage training resources (admin)
 
 ### Article Management
 - UC-AR1 View published articles
@@ -147,6 +167,7 @@ Layer 4: Data and Storage
 - MySQL relational database
 - Upload static file storage (/uploads)
 - Excel workbook generation engine for exports
+- Consolidated master migration script for schema provisioning
 
 ## 7. DFD Source Data
 

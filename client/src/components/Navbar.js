@@ -85,21 +85,22 @@ const Navbar = () => {
                     <FaClipboardList size={20} aria-hidden="true" />
                     <span>InsightForge</span>
                 </Link>
-                <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
-                    <Link to="/surveys" style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}>Surveys</Link>
-                    <Link to="/articles" style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}>Articles</Link>
-                    <Link to="/consulting" style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}>Consulting</Link>
+                <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px', minWidth: 0 }}>
+                    <Link to="/surveys" style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}>Surveys</Link>
+                    <Link to="/articles" style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}>Articles</Link>
+                    <Link to="/consulting" style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}>Consulting</Link>
                 </div>
-                <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
+                <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px', minWidth: 0 }}>
                     <Link
                         to="/login"
                         style={{
                             color: 'white',
                             textDecoration: 'none',
-                            fontSize: '0.95rem',
-                            padding: '7px 16px',
+                            fontSize: 'clamp(0.75rem, 2vw, 0.95rem)',
+                            padding: '7px 12px',
                             border: '1px solid rgba(255,255,255,0.5)',
                             borderRadius: '4px',
+                            whiteSpace: 'nowrap',
                         }}
                     >
                         Login
@@ -110,10 +111,11 @@ const Navbar = () => {
                             color: '#003594',
                             backgroundColor: '#FFB81C',
                             textDecoration: 'none',
-                            fontSize: '0.95rem',
+                            fontSize: 'clamp(0.75rem, 2vw, 0.95rem)',
                             fontWeight: '600',
-                            padding: '7px 16px',
+                            padding: '7px 12px',
                             borderRadius: '4px',
+                            whiteSpace: 'nowrap',
                         }}
                     >
                         Register
@@ -157,35 +159,35 @@ const Navbar = () => {
                 </Link>
             </div>
 
-            <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px' }}>
+            <div className="flex align-center gap-3" style={{ flexWrap: 'wrap', rowGap: '6px', minWidth: 0 }}>
                 <Link
                     to="/dashboard"
-                    style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}
+                    style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}
                 >
                     Home
                 </Link>
                 <Link
                     to="/training"
-                    style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}
+                    style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}
                 >
                     Training
                 </Link>
                 <Link
                     to="/consulting"
-                    style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}
+                    style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}
                 >
                     Consulting
                 </Link>
                 <Link
                     to="/media"
-                    style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}
+                    style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}
                 >
                     Media
                 </Link>
                 {isAdmin && (
                     <Link
                         to="/admin"
-                        style={{ color: 'white', textDecoration: 'none', fontSize: '0.95rem' }}
+                        style={{ color: 'white', textDecoration: 'none', fontSize: 'clamp(0.75rem, 2vw, 0.95rem)' }}
                     >
                         Admin
                     </Link>

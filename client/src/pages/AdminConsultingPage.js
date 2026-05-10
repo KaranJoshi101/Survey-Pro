@@ -6,6 +6,7 @@ import consultingService from '../services/consultingService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BackLink from '../components/BackLink';
 import { useToast } from '../context/ToastContext';
+import { API_ORIGIN } from '../config/api';
 
 const quillFormats = [
     'header',
@@ -829,7 +830,7 @@ const AdminConsultingPage = () => {
                                     <div style={{ marginTop: '6px' }}>
                                         {selectedRequest.file_url ? (
                                             <a
-                                                href={`${(process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '')}${selectedRequest.file_url}`}
+                                                href={`${API_ORIGIN}${selectedRequest.file_url}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >

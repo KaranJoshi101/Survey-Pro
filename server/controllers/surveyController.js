@@ -1,6 +1,7 @@
 // Survey Controller
 const path = require('path');
 const surveyModel = require('../models/surveyModel');
+const { buildUrl } = require('../utils/baseUrl');
 
 const ALLOWED_QUESTION_TYPES = new Set([
     'multiple_choice',
@@ -101,7 +102,7 @@ const uploadSurveyEmailAttachments = async (req, res, next) => {
         const attachments = files.map((file) => ({
             name: file.originalname,
             path: `/uploads/survey-email-attachments/${path.basename(file.path)}`,
-            url: `${req.protocol}://${req.get('host')}/uploads/survey-email-attachments/${path.basename(file.path)}`,
+            url: buildUrl(`/uploads/survey-email-attachments/${path.basename(file.path)}`),
             size: file.size,
             mimeType: file.mimetype,
         }));
