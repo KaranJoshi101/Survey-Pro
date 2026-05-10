@@ -33,14 +33,15 @@ const corsOptions = isDev
             }
             if (allowedOrigins.includes(origin.replace(/\/+$/, ''))) {
                 return callback(null, true);
-            }
-            return callback(new Error('CORS policy blocked this origin'));
-        },
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+                }
+                return callback(new Error('CORS policy blocked this origin'));
+            },
+            methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
                 allowedHeaders: allowedRequestHeaders,
-        credentials: false,
-        maxAge: 86400,
-      };
+            // Allow credentials (cookies/auth) when browser requests include credentials
+            credentials: true,
+            maxAge: 86400,
+              };
 
 // In development: no rate limiting (pass-through middleware).
 const _noLimit = (_req, _res, next) => next();
